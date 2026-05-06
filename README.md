@@ -1,32 +1,146 @@
-# Arboard in Kotlin
+# arboard-kotlin in Kotlin
 
 [![GitHub link](https://img.shields.io/badge/GitHub-KotlinMania%2Farboard--kotlin-blue.svg)](https://github.com/KotlinMania/arboard-kotlin)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.kotlinmania/arboard-kotlin)](https://central.sonatype.com/artifact/io.github.kotlinmania/arboard-kotlin)
 [![Build status](https://img.shields.io/github/actions/workflow/status/KotlinMania/arboard-kotlin/ci.yml?branch=main)](https://github.com/KotlinMania/arboard-kotlin/actions)
 
-Kotlin Multiplatform line-by-line clean-room port of the Rust crate [`arboard`](https://crates.io/crates/arboard).
+This is a Kotlin Multiplatform line-by-line transliteration port of [`1Password/arboard`](https://github.com/1Password/arboard).
 
-> **Status: scaffold — porting has not started.** This repo currently contains build infrastructure only. The upstream Rust source for the `arboard` crate will be cloned into `tmp/` (gitignored) when porting begins.
+**Original Project:** This port is based on [`1Password/arboard`](https://github.com/1Password/arboard). All design credit and project intent belong to the upstream authors; this repository is a faithful port to Kotlin Multiplatform with no behavioural changes intended.
 
-## About
+### Porting status
 
-Cross-platform clipboard access
+This is an **in-progress port**. The goal is feature parity with the upstream Rust crate while providing a native Kotlin Multiplatform API. Every Kotlin file carries a `// port-lint: source <path>` header naming its upstream Rust counterpart so the AST-distance tool can track provenance.
 
-This port targets functional parity with the upstream Rust crate while presenting an idiomatic Kotlin Multiplatform API. Every Kotlin file is a faithful translation of an upstream Rust file and carries a `// port-lint: source <path>` header so the AST-distance tool can track provenance.
+---
 
-## Supported targets
+## Upstream README — `1Password/arboard`
 
-- macOS arm64 / x64
-- Linux x64
-- Windows mingw-x64
-- iOS arm64 / x64 / simulator-arm64
-- JS (browser + Node.js)
-- Wasm-JS (browser + Node.js)
-- Android (API 24+)
+> The text below is reproduced and lightly edited from [`https://github.com/1Password/arboard`](https://github.com/1Password/arboard). It is the upstream project's own description and remains under the upstream authors' authorship; links have been rewritten to absolute upstream URLs so they continue to resolve from this repository.
 
-## Installation
+## Arboard (Arthur's Clipboard)
 
-Once published:
+[![Latest version](https://img.shields.io/crates/v/arboard?color=mediumvioletred)](https://crates.io/crates/arboard)
+[![Documentation](https://docs.rs/arboard/badge.svg)](https://docs.rs/arboard)
+![MSRV](https://img.shields.io/badge/rustc-1.71.0+-blue.svg)
+
+## General
+
+This is a cross-platform library for interacting with the clipboard. It allows
+to copy and paste both text and image data in a platform independent way on
+Linux, Mac, and Windows.
+
+Please note that this is not an official 1Password product. Feature requests will be considered like any other volunteer-based crate.
+
+## GNU/Linux
+
+### Backend Support
+
+By default, `arboard`'s backend on Linux supports X11 (or XWayland implementations) and uses
+that for managing the various Linux clipboard variants. This supports the majority of desktop 
+environments that exist in the wild today. `arboard` will use the `Clipboard` selection by default,
+but the [LinuxClipboardKind](https://docs.rs/arboard/latest/arboard/enum.LinuxClipboardKind.html)
+selector lets you operate on the `Primary` or `Secondary` clipboard selections (if supported).
+
+However, Wayland is becoming the majority default as of 2025. Some distributions are
+even considering the removal of X by default. To support Wayland correctly, `arboard` users
+should enable the `wayland-data-control` feature. If enabled, it will be prioritized over the X clipboard.
+
+Wayland support is not enabled by default because it may be counterintuitive 
+to some users: it relies on the data-control protocol extension(s), which _are not_
+supported by all Wayland compositors. You can check compositor support on `wayland.app`:
+- [ext-data-control-v1](https://wayland.app/protocols/ext-data-control-v1)
+- [wlr-data-control-unstable-v1](https://wayland.app/protocols/wlr-data-control-unstable-v1)
+
+If you or a user's desktop doesn't support these protocols, `arboard` won't function in a pure
+Wayland environment. It is recommended to enable `XWayland` for these cases. If your app runs inside
+an isolated sandbox, such as Flatpak or Snap, you'll need to expose the X11 socket to the application
+_in addition_ to the Wayland communication interface.
+
+### Clipboard Ownership
+
+Some apps and users may notice that sometimes values copied to a Linux clipboard with this crate vanish
+before anyone gets the chance to paste, or just aren't available when you expect them to be. The root behind
+these problems is _selection ownership_.
+
+X11 and Wayland put the responsibility for answering paste requests and serving data on the application
+which originally copied it onto the clipboard. This usually means the app using `arboard`. Nothing you copy
+to the clipboard is sent anywhere to start. It stays inside `arboard` until something else on the system requests it,
+which is very different to how the clipboard works on other platforms like macOS or Windows.
+
+Note that `arboard` may attempt to warn you about these conditions when compiled in debug mode, to improve the debugging
+experience. Even if you don't see these warnings, you should double check the lifetime of the `Clipboard` in your code.
+
+In some cases, an environment may have a clipboard manager installed. These services monitor the clipboard contents and
+do their best to retain a copy when needed to smooth over clipboard ownership changes. A clipboar manager can make contents
+available even after a process previously owning it exits.
+
+In order to keep the contents around longer, make sure that you don't `Drop` your `Clipboard` object right away or
+terminate the copying process too fast. This is why, at times, adding a call to `sleep()` near the set operation
+makes it behave more reliabily: the background thread `arboard` uses for serving clipboard contents has more time to run
+and let other apps (including clipboard managers) make requests for the contents. However `sleep` isn't the recommended approach.
+
+If your application is exiting, you must make sure there is a clipboard manager running on the system. If nothing is listening for 
+the clipboard ownership transfer, or made a copy previously, the data will be lost. Note that this isn't a complete 
+guarantee as races are possible if your program's main thread is exiting. If you would like to fully synchronize the clipboard "paste"
+before exiting, you can use the [wait](https://docs.rs/arboard/latest/arboard/trait.SetExtLinux.html#tymethod.wait) method when setting
+contents on the clipboard. This will block the calling thread until another app has requested, and then received, the data.
+
+If your application is longer-running (ie a GUI, TUI, etc), it is highly recommended that you either store the `Clipboard` object in some 
+long-lived data structure (like app context, etc) or utilize `wait` method mentioned above, and/or threading to make sure another 
+app can request the clipboard data later.
+
+We welcome suggestions to improve on the above issues in ways that don't degrade other use cases.
+
+## Example
+
+```rust
+use arboard::Clipboard;
+
+fn main() {
+    let mut clipboard = Clipboard::new().unwrap();
+    println!("Clipboard text was: {}", clipboard.get_text().unwrap());
+
+    let the_string = "Hello, world!";
+    clipboard.set_text(the_string).unwrap();
+    println!("But now the clipboard text should be: \"{}\"", the_string);
+}
+```
+
+## Credits
+
+This crate is a combined effort by 1Password staff and `@ArturKovacs`, the crate's past
+maintainer.
+
+#### License
+
+<sup>
+Licensed under either of <a href="LICENSE-APACHE.txt">Apache License, Version
+2.0</a> or <a href="LICENSE-MIT.txt">MIT license</a> at your option.
+</sup>
+
+<br>
+
+<sub>
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in this crate by you, as defined in the Apache-2.0 license, shall
+be dual licensed as above, without any additional terms or conditions.
+</sub>
+
+#### History: Yet another clipboard crate
+
+This crate started out as a fork of `rust-clipboard`. The reason for forking is due to the former
+crate not being maintained any longer. At this point, `arboard`'s backends and public APIs have diverged
+a lot.
+
+`arboard`'s original maintainer noted that "I don't know why this is happening but while it is, we might 
+as well just start naming the clipboard crates after ourselves. This one is arboard which stands for Artur's clipboard.".
+
+---
+
+## About this Kotlin port
+
+### Installation
 
 ```kotlin
 dependencies {
@@ -34,19 +148,34 @@ dependencies {
 }
 ```
 
-## Build
+### Building
 
 ```bash
 ./gradlew build
 ./gradlew test
 ```
 
-## Porting guidelines
+### Targets
 
-See [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md) for translator discipline, port-lint header convention, and Rust → Kotlin idiom mapping.
+- macOS arm64
+- Linux x64
+- Windows mingw-x64
+- iOS arm64 / simulator-arm64 (Swift export + XCFramework)
+- JS (browser + Node.js)
+- Wasm-JS (browser + Node.js)
+- Android (API 24+)
 
-## License
+### Porting guidelines
 
-Apache 2.0 — see [LICENSE](LICENSE).
+See [AGENTS.md](AGENTS.md) and [CLAUDE.md](CLAUDE.md) for translator discipline, port-lint header convention, and Rust → Kotlin idiom mapping.
 
-Original work copyrighted by the upstream `arboard` authors. Kotlin port copyright (c) 2026 Sydney Renee and The Solace Project.
+### License
+
+This Kotlin port is distributed under the same MIT license as the upstream [`1Password/arboard`](https://github.com/1Password/arboard). See [LICENSE](LICENSE) (and any sibling `LICENSE-*` / `NOTICE` files mirrored from upstream) for the full text.
+
+Original work copyrighted by the arboard authors.  
+Kotlin port: Copyright (c) 2026 Sydney Renee and The Solace Project.
+
+### Acknowledgments
+
+Thanks to the [`1Password/arboard`](https://github.com/1Password/arboard) maintainers and contributors for the original Rust implementation. This port reproduces their work in Kotlin Multiplatform; bug reports about upstream design or behavior should go to the upstream repository.
