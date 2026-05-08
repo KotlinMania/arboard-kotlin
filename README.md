@@ -144,7 +144,7 @@ as well just start naming the clipboard crates after ourselves. This one is arbo
 
 ```kotlin
 dependencies {
-    implementation("io.github.kotlinmania:arboard-kotlin:0.1.0-SNAPSHOT")
+    implementation("io.github.kotlinmania:arboard-kotlin:0.1.0")
 }
 ```
 
