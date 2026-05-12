@@ -87,7 +87,6 @@ jobs:
 
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
-        if: matrix.build-mode != 'manual' || steps.kt_src.outputs.has_source == 'true'
         uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
@@ -112,42 +111,7 @@ jobs:
           echo "JAVA_TOOL_OPTIONS=${JAVA_TOOL_OPTIONS}"
           ./gradlew --no-daemon codeqlCompileJvm --no-configuration-cache
 
-      - name: Compile every Kotlin target for CodeQL extraction
-        if: matrix.build-mode == 'manual' && steps.kt_src.outputs.has_source == 'true'
-        shell: bash
-        # `compileAndroidMain` emits real JVM `.class` files under
-        # `build/classes/kotlin/android/main` via the
-        # `com.android.kotlin.multiplatform.library` plugin — the JVM
-        # `kotlinc` exec is exactly what the CodeQL Kotlin extractor's
-        # LD_PRELOAD tracer hooks. `compileKotlinJs` and
-        # `compileKotlinWasmJs` are listed on the chance that the tracer
-        # also matches the K/JS and K/WASM compilers, in which case jsMain
-        # and wasmJsMain sources land in the database too.
-        #
-        # `--rerun-tasks --no-build-cache` defeats Gradle's up-to-date
-        # check and the cache hits restored by setup-gradle so kotlinc is
-        # actually invoked. `--no-configuration-cache --no-daemon` are
-        # belt-and-braces for the same property: every gradle invocation
-        # = new JVM = new traceable exec.
-        #
-        # `kotlin.compiler.execution.strategy=out-of-process` spawns a
-        # fresh kotlinc JVM per compilation; the LD_PRELOAD tracer hooks
-        # new process execs, so out-of-process gives it something to
-        # intercept (the default `daemon` strategy reuses long-lived JVMs
-        # the tracer wasn't around for).
-        run: |
-          ./gradlew \
-            compileAndroidMain \
-            compileKotlinJs \
-            compileKotlinWasmJs \
-            --rerun-tasks \
-            --no-build-cache \
-            -Pkotlin.compiler.execution.strategy=out-of-process \
-            --no-configuration-cache \
-            --no-daemon
-
       - name: Perform CodeQL Analysis
-        if: matrix.build-mode != 'manual' || steps.kt_src.outputs.has_source == 'true'
         uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{ matrix.language }}"
