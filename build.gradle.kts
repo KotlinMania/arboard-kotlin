@@ -352,7 +352,6 @@ val codeqlCompileJvm = tasks.register<JavaExec>("codeqlCompileJvm") {
         ) + sourceFiles.map { it.absolutePath }
     }
 }
-
 tasks.register("test") {
     group = "verification"
     description =
