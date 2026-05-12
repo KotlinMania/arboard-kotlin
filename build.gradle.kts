@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.ClasspathNormalizer
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
@@ -36,64 +38,34 @@ kotlin {
     val xcf = XCFramework("Arboard")
 
     macosArm64 {
-        binaries.framework {
-            baseName = "Arboard"
-            xcf.add(this)
-        }
+        binaries.framework { baseName = "Arboard"; xcf.add(this) }
     }
     iosArm64 {
-        binaries.framework {
-            baseName = "Arboard"
-            xcf.add(this)
-        }
+        binaries.framework { baseName = "Arboard"; xcf.add(this) }
     }
     iosSimulatorArm64 {
-        binaries.framework {
-            baseName = "Arboard"
-            xcf.add(this)
-        }
+        binaries.framework { baseName = "Arboard"; xcf.add(this) }
     }
     iosX64 {
-        binaries.framework {
-            baseName = "Arboard"
-            xcf.add(this)
-        }
+        binaries.framework { baseName = "Arboard"; xcf.add(this) }
     }
     tvosArm64 {
-        binaries.framework {
-            baseName = "Arboard"
-            xcf.add(this)
-        }
+        binaries.framework { baseName = "Arboard"; xcf.add(this) }
     }
     tvosSimulatorArm64 {
-        binaries.framework {
-            baseName = "Arboard"
-            xcf.add(this)
-        }
+        binaries.framework { baseName = "Arboard"; xcf.add(this) }
     }
     watchosArm32 {
-        binaries.framework {
-            baseName = "Arboard"
-            xcf.add(this)
-        }
+        binaries.framework { baseName = "Arboard"; xcf.add(this) }
     }
     watchosArm64 {
-        binaries.framework {
-            baseName = "Arboard"
-            xcf.add(this)
-        }
+        binaries.framework { baseName = "Arboard"; xcf.add(this) }
     }
     watchosDeviceArm64 {
-        binaries.framework {
-            baseName = "Arboard"
-            xcf.add(this)
-        }
+        binaries.framework { baseName = "Arboard"; xcf.add(this) }
     }
     watchosSimulatorArm64 {
-        binaries.framework {
-            baseName = "Arboard"
-            xcf.add(this)
-        }
+        binaries.framework { baseName = "Arboard"; xcf.add(this) }
     }
 
     linuxX64()
@@ -262,20 +234,8 @@ mavenPublishing {
 // ---------------------------------------------------------------------------
 // CodeQL Java/Kotlin extraction task
 //
-// `.github/workflows/codeql.yml` invokes `./gradlew codeqlCompileJvm` to feed
-// kotlinc-compiled commonMain through the CodeQL Java agent. The KMP build
-// engages the K2 phased pipeline that bypasses the agent's
-// `K2JVMCompiler.doExecute` hook, so this task runs a separate single-target
-// JVM compile of commonMain sources via JavaExec with NO multiplatform flags,
-// causing kotlinc to dispatch through the legacy path the agent hooks.
-//
-// When commonMain has no .kt files (pre-port repo with only .gitkeep), the
-// task writes a tiny placeholder under `build/generated/codeql-empty-source/`
-// so kotlinc always has at least one source. Skipping the task with onlyIf
-// is intentionally avoided: a silent skip is indistinguishable in CI from a
-// real run, which is abusable. The sentinel approach forces the compile to
-// execute every time so any future drift is caught.
-
+// .github/workflows/codeql.yml invokes `./gradlew codeqlCompileJvm` to feed
+// kotlinc-compiled commonMain through the CodeQL Java agent.
 val codeqlKotlinc: Configuration by configurations.creating {
     description = "Kotlin compiler (CodeQL extraction target only — not published)"
     isCanBeResolved = true
@@ -300,10 +260,7 @@ dependencies {
 
 val codeqlCompileJvm = tasks.register<JavaExec>("codeqlCompileJvm") {
     description =
-        "Compile commonMain Kotlin sources with kotlinc 2.3.21 for CodeQL Java/Kotlin extraction. " +
-        "Not part of any published artifact; intended to be wrapped by `codeql database create` " +
-        "or `github/codeql-action/init` so the LD_PRELOAD tracer can attach the extractor agent " +
-        "to the in-process kotlinc."
+        "Compile commonMain Kotlin sources with kotlinc 2.3.21 for CodeQL Java/Kotlin extraction."
     group = "verification"
 
     classpath(codeqlKotlinc)
@@ -321,9 +278,7 @@ val codeqlCompileJvm = tasks.register<JavaExec>("codeqlCompileJvm") {
         outDir.get().asFile.mkdirs()
         val sourceFiles = sources.files.toMutableList()
         if (sourceFiles.isEmpty()) {
-            val sentinelFile = sentinelDir.get().asFile.resolve(
-                "io/github/kotlinmania/codeql/_CodeqlEmptySource.kt",
-            )
+            val sentinelFile = sentinelDir.get().asFile.resolve("io/github/kotlinmania/codeql/_CodeqlEmptySource.kt")
             sentinelFile.parentFile.mkdirs()
             sentinelFile.writeText(
                 """
@@ -333,7 +288,6 @@ val codeqlCompileJvm = tasks.register<JavaExec>("codeqlCompileJvm") {
                 package io.github.kotlinmania.codeql
 
                 private object _CodeqlEmptySource
-
                 """.trimIndent(),
             )
             sourceFiles += sentinelFile
@@ -346,12 +300,13 @@ val codeqlCompileJvm = tasks.register<JavaExec>("codeqlCompileJvm") {
             "-no-reflect",
             "-language-version", "2.3",
             "-api-version", "2.3",
+            "-Xexpect-actual-classes",
             "-opt-in", "kotlin.time.ExperimentalTime",
             "-opt-in", "kotlin.concurrent.atomics.ExperimentalAtomicApi",
-            "-Xexpect-actual-classes",
         ) + sourceFiles.map { it.absolutePath }
     }
 }
+
 tasks.register("test") {
     group = "verification"
     description =
