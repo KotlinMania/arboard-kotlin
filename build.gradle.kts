@@ -200,10 +200,18 @@ kotlin {
         binaries.framework { baseName = "Arboard"; xcf.add(this) }
     }
     iosSimulatorArm64 {
-        binaries.framework { baseName = "Arboard"; xcf.add(this) }
+        binaries.framework {
+            baseName = "Arboard"
+            isStatic = true
+            xcf.add(this)
+        }
     }
     iosX64 {
-        binaries.framework { baseName = "Arboard"; xcf.add(this) }
+        binaries.framework {
+            baseName = "Arboard"
+            isStatic = true
+            xcf.add(this)
+        }
     }
 
     tvosArm64 {
