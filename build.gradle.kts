@@ -200,10 +200,18 @@ kotlin {
         binaries.framework { baseName = "Arboard"; xcf.add(this) }
     }
     iosSimulatorArm64 {
-        binaries.framework { baseName = "Arboard"; xcf.add(this) }
+        binaries.framework {
+            baseName = "Arboard"
+            isStatic = true
+            xcf.add(this)
+        }
     }
     iosX64 {
-        binaries.framework { baseName = "Arboard"; xcf.add(this) }
+        binaries.framework {
+            baseName = "Arboard"
+            isStatic = true
+            xcf.add(this)
+        }
     }
 
     tvosArm64 {
@@ -274,6 +282,8 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0")
+                // Upstream src/platform/linux/{mod,x11}.rs use `log::{trace, warn, error, debug}`.
+                implementation("io.github.kotlinmania:log-kotlin:0.1.1")
             }
         }
         val commonTest by getting {
