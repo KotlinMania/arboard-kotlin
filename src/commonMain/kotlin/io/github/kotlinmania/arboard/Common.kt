@@ -59,15 +59,15 @@ sealed class Error(message: String) : Throwable(message) {
 
     /** Any error that doesn't fit the other error types.
      *
-     *  The `description` field is only meant to help the developer and should not be relied on as a
+     *  The `details` field is only meant to help the developer and should not be relied on as a
      *  means to identify an error case during runtime. */
-    class Unknown(val description: String) : Error(
-        "Unknown error while interacting with the clipboard: $description"
+    class Unknown(val details: String) : Error(
+        "Unknown error while interacting with the clipboard: $details"
     ) {
         override fun equals(other: Any?): Boolean =
-            this === other || (other is Unknown && other.description == description)
+            this === other || (other is Unknown && other.details == details)
 
-        override fun hashCode(): Int = description.hashCode()
+        override fun hashCode(): Int = details.hashCode()
     }
 
     override fun toString(): String {
