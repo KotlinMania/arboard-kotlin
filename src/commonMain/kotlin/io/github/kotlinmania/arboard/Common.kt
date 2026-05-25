@@ -1,4 +1,4 @@
-// port-lint: source src/common.rs
+// port-lint: source common.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
@@ -18,7 +18,7 @@ package io.github.kotlinmania.arboard
  * this type in such a way that they give a short human-readable description of the error;
  * however the documentation gives a more detailed explanation for each error kind.
  *
- * The upstream type carries the `non_exhaustive` attribute, indicating that new variants may be
+ * The upstream type carries a non-exhaustive marker, indicating that new variants may be
  * added in future releases.
  */
 sealed class Error(message: String) : Throwable(message) {
@@ -167,6 +167,10 @@ internal class ScopeGuard(callback: () -> Unit) : AutoCloseable {
             callback = null
             cb()
         }
+    }
+
+    internal companion object {
+        internal fun new(callback: () -> Unit): ScopeGuard = ScopeGuard(callback)
     }
 }
 
