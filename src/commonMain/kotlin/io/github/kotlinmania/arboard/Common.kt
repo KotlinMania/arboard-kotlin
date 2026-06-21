@@ -21,12 +21,14 @@ package io.github.kotlinmania.arboard
  * The upstream type carries a non-exhaustive marker, indicating that new variants may be
  * added in future releases.
  */
-sealed class Error(message: String) : Throwable(message) {
+sealed class Error(
+    message: String,
+) : Throwable(message) {
     /** The clipboard contents were not available in the requested format.
      *  This could either be due to the clipboard being empty or the clipboard contents having
      *  an incompatible format to the requested one (eg when calling `getImage` on text) */
     object ContentNotAvailable : Error(
-        "The clipboard contents were not available in the requested format or the clipboard is empty."
+        "The clipboard contents were not available in the requested format or the clipboard is empty.",
     )
 
     /** The selected clipboard is not supported by the current configuration (system and/or environment).
@@ -35,7 +37,7 @@ sealed class Error(message: String) : Throwable(message) {
      *  - Using the Primary clipboard with an older Wayland compositor (that doesn't support version 2)
      *  - Using the Secondary clipboard on Wayland */
     object ClipboardNotSupported : Error(
-        "The selected clipboard is not supported with the current system configuration."
+        "The selected clipboard is not supported with the current system configuration.",
     )
 
     /** The native clipboard is not accessible due to being held by another party.
@@ -48,22 +50,24 @@ sealed class Error(message: String) : Throwable(message) {
      *  implementation will make sure that the native clipboard is only
      *  opened for transferring data and then closed as soon as possible. */
     object ClipboardOccupied : Error(
-        "The native clipboard is not accessible due to being held by another party."
+        "The native clipboard is not accessible due to being held by another party.",
     )
 
     /** The image or the text that was about the be transferred to/from the clipboard could not be
      *  converted to the appropriate format. */
     object ConversionFailure : Error(
-        "The image or the text that was about the be transferred to/from the clipboard could not be converted to the appropriate format."
+        "The image or the text that was about the be transferred to/from the clipboard could not be converted to the appropriate format.",
     )
 
     /** Any error that doesn't fit the other error types.
      *
      *  The `description` field is only meant to help the developer and should not be relied on as a
      *  means to identify an error case during runtime. */
-    class Unknown(val description: String) : Error(
-        "Unknown error while interacting with the clipboard: $description"
-    ) {
+    class Unknown(
+        val description: String,
+    ) : Error(
+            "Unknown error while interacting with the clipboard: $description",
+        ) {
         override fun equals(other: Any?): Boolean =
             this === other || (other is Unknown && other.description == description)
 
@@ -71,13 +75,14 @@ sealed class Error(message: String) : Throwable(message) {
     }
 
     override fun toString(): String {
-        val name = when (this) {
-            ContentNotAvailable -> "ContentNotAvailable"
-            ClipboardNotSupported -> "ClipboardNotSupported"
-            ClipboardOccupied -> "ClipboardOccupied"
-            ConversionFailure -> "ConversionFailure"
-            is Unknown -> "Unknown { .. }"
-        }
+        val name =
+            when (this) {
+                ContentNotAvailable -> "ContentNotAvailable"
+                ClipboardNotSupported -> "ClipboardNotSupported"
+                ClipboardOccupied -> "ClipboardOccupied"
+                ConversionFailure -> "ConversionFailure"
+                is Unknown -> "Unknown { .. }"
+            }
         return "$name - \"${message ?: ""}\""
     }
 
@@ -127,18 +132,21 @@ class ImageData(
 
     /** Returns an image data that is guaranteed to own its bytes.
      *  It moves the bytes if they are already owned and clones them if they are borrowed. */
-    fun toOwnedImg(): ImageData = ImageData(
-        width = width,
-        height = height,
-        bytes = bytes.copyOf(),
-    )
+    fun toOwnedImg(): ImageData =
+        ImageData(
+            width = width,
+            height = height,
+            bytes = bytes.copyOf(),
+        )
 
     override fun equals(other: Any?): Boolean =
         this === other ||
-            (other is ImageData &&
-                other.width == width &&
-                other.height == height &&
-                other.bytes.contentEquals(bytes))
+            (
+                other is ImageData &&
+                    other.width == width &&
+                    other.height == height &&
+                    other.bytes.contentEquals(bytes)
+            )
 
     override fun hashCode(): Int {
         var result = width
@@ -158,7 +166,9 @@ class ImageData(
  *
  * Gated upstream to `windows` and `unix` (non-macOS) configurations.
  */
-internal class ScopeGuard(callback: () -> Unit) : AutoCloseable {
+internal class ScopeGuard(
+    callback: () -> Unit,
+) : AutoCloseable {
     private var callback: (() -> Unit)? = callback
 
     override fun close() {
