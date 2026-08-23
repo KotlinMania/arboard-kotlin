@@ -34,4 +34,10 @@ package io.github.kotlinmania.arboard.platform
  *   No callers have been migrated; lib.rs owns the intra-repo consumer path.
  */
 
-internal object Mod
+/**
+ * Module descriptor for the upstream platform module aggregator.
+ */
+public object PlatformMod {
+    public const val MODULE_NAME: String = "platform"
+    public const val CRATE_NAME: String = "arboard"
+}
