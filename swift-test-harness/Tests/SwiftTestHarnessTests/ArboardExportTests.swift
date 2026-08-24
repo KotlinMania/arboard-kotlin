@@ -1,10 +1,12 @@
-import XCTest
+import Testing
 import Arboard
 
-final class ArboardExportTests: XCTestCase {
-    func testSwiftModuleLoads() throws {
+@Suite("Arboard Swift Export Suite")
+struct ArboardExportTests {
+    @Test("Swift module loads cleanly and basic Clipboard functions")
+    func swiftModuleLoads() throws {
         let clipboard = Clipboard.Companion.shared.create()
         clipboard.setText(text: "swift export test")
-        XCTAssertEqual(clipboard.getText(), "swift export test")
+        #expect(clipboard.getText() == "swift export test")
     }
 }
