@@ -21,58 +21,70 @@ package io.github.kotlinmania.arboard
  * The upstream type carries a non-exhaustive marker, indicating that new variants may be
  * added in future releases.
  */
-sealed class Error(
+public sealed class Error(
     message: String,
 ) : Throwable(message) {
-    /** The clipboard contents were not available in the requested format.
-     *  This could either be due to the clipboard being empty or the clipboard contents having
-     *  an incompatible format to the requested one (eg when calling `getImage` on text) */
-    object ContentNotAvailable : Error(
+    /**
+     * The clipboard contents were not available in the requested format.
+     * This could either be due to the clipboard being empty or the clipboard contents having
+     * an incompatible format to the requested one (eg when calling `getImage` on text)
+     */
+    public object ContentNotAvailable : Error(
         "The clipboard contents were not available in the requested format or the clipboard is empty.",
     )
 
-    /** The selected clipboard is not supported by the current configuration (system and/or environment).
+    /**
+     * The selected clipboard is not supported by the current configuration (system and/or environment).
      *
-     *  This can be caused by a few conditions:
-     *  - Using the Primary clipboard with an older Wayland compositor (that doesn't support version 2)
-     *  - Using the Secondary clipboard on Wayland */
-    object ClipboardNotSupported : Error(
+     * This can be caused by a few conditions:
+     * - Using the Primary clipboard with an older Wayland compositor (that doesn't support version 2)
+     * - Using the Secondary clipboard on Wayland
+     */
+    public object ClipboardNotSupported : Error(
         "The selected clipboard is not supported with the current system configuration.",
     )
 
-    /** The native clipboard is not accessible due to being held by another party.
+    /**
+     * The native clipboard is not accessible due to being held by another party.
      *
-     *  This "other party" could be a different process or it could be within
-     *  the same program. So for example you may get this error when trying
-     *  to interact with the clipboard from multiple threads at once.
+     * This "other party" could be a different process or it could be within
+     * the same program. So for example you may get this error when trying
+     * to interact with the clipboard from multiple threads at once.
      *
-     *  Note that it's OK to have multiple `Clipboard` instances. The underlying
-     *  implementation will make sure that the native clipboard is only
-     *  opened for transferring data and then closed as soon as possible. */
-    object ClipboardOccupied : Error(
+     * Note that it's OK to have multiple `Clipboard` instances. The underlying
+     * implementation will make sure that the native clipboard is only
+     * opened for transferring data and then closed as soon as possible.
+     */
+    public object ClipboardOccupied : Error(
         "The native clipboard is not accessible due to being held by another party.",
     )
 
-    /** The image or the text that was about the be transferred to/from the clipboard could not be
-     *  converted to the appropriate format. */
-    object ConversionFailure : Error(
+    /**
+     * The image or the text that was about the be transferred to/from the clipboard could not be
+     * converted to the appropriate format.
+     */
+    public object ConversionFailure : Error(
         "The image or the text that was about the be transferred to/from the clipboard could not be converted to the appropriate format.",
     )
 
-    /** Any error that doesn't fit the other error types.
+    /**
+     * Any error that doesn't fit the other error types.
      *
-     *  The `description` field is only meant to help the developer and should not be relied on as a
-     *  means to identify an error case during runtime. */
-    class Unknown(
-        val description: String,
+     * The `errorDescription` field is only meant to help the developer and should not be relied on as a
+     * means to identify an error case during runtime.
+     */
+    public class Unknown(
+        public val errorDescription: String,
     ) : Error(
-            "Unknown error while interacting with the clipboard: $description",
+            "Unknown error while interacting with the clipboard: $errorDescription",
         ) {
         override fun equals(other: Any?): Boolean =
-            this === other || (other is Unknown && other.description == description)
+            this === other || (other is Unknown && other.errorDescription == errorDescription)
 
-        override fun hashCode(): Int = description.hashCode()
+        override fun hashCode(): Int = errorDescription.hashCode()
     }
+
+    public fun fmt(): String = toString()
 
     override fun toString(): String {
         val name =
@@ -86,8 +98,8 @@ sealed class Error(
         return "$name - \"${message ?: ""}\""
     }
 
-    internal companion object {
-        internal fun unknown(message: String): Error = Unknown(message)
+    public companion object {
+        public fun unknown(message: String): Error = Unknown(message)
     }
 }
 
@@ -121,18 +133,22 @@ sealed class Error(
  *
  * Gated upstream behind the `image-data` Cargo feature.
  */
-class ImageData(
-    val width: Int,
-    val height: Int,
-    val bytes: ByteArray,
+public class ImageData(
+    public val width: Int,
+    public val height: Int,
+    public val bytes: ByteArray,
 ) {
-    /** Returns a the bytes field in a way that it's guaranteed to be owned.
-     *  It moves the bytes if they are already owned and clones them if they are borrowed. */
-    fun intoOwnedBytes(): ByteArray = bytes.copyOf()
+    /**
+     * Returns a the bytes field in a way that it's guaranteed to be owned.
+     * It moves the bytes if they are already owned and clones them if they are borrowed.
+     */
+    public fun intoOwnedBytes(): ByteArray = bytes.copyOf()
 
-    /** Returns an image data that is guaranteed to own its bytes.
-     *  It moves the bytes if they are already owned and clones them if they are borrowed. */
-    fun toOwnedImg(): ImageData =
+    /**
+     * Returns an image data that is guaranteed to own its bytes.
+     * It moves the bytes if they are already owned and clones them if they are borrowed.
+     */
+    public fun toOwnedImg(): ImageData =
         ImageData(
             width = width,
             height = height,
@@ -166,10 +182,14 @@ class ImageData(
  *
  * Gated upstream to `windows` and `unix` (non-macOS) configurations.
  */
-internal class ScopeGuard(
+public class ScopeGuard(
     callback: () -> Unit,
 ) : AutoCloseable {
     private var callback: (() -> Unit)? = callback
+
+    public fun drop() {
+        close()
+    }
 
     override fun close() {
         val cb = callback
@@ -179,16 +199,14 @@ internal class ScopeGuard(
         }
     }
 
-    internal companion object {
-        internal fun new(callback: () -> Unit): ScopeGuard = ScopeGuard(callback)
+    public companion object {
+        public fun new(callback: () -> Unit): ScopeGuard = ScopeGuard(callback)
     }
 }
 
-/** Common interface for sealing platform extension types. */
-internal object Private {
-    interface Sealed
-
-    // Upstream additionally implements `Sealed` for the `Get`, `Set`, and `Clear` builders
-    // declared in `lib.rs`. Those types will declare `Private.Sealed` as a supertype when
-    // their own port lands.
+/**
+ * Common interface for sealing platform extension types.
+ */
+public object Private {
+    public interface Sealed
 }

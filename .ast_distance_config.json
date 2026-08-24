@@ -18,6 +18,8 @@
   },
   "reexport_modules": [
     "mod.rs",
-    "lib.rs"
+    "platform.mod",
+    "platform/mod.rs",
+    "platform/linux/mod.rs"
   ]
 }

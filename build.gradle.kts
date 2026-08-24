@@ -912,6 +912,27 @@ tasks.register("hostTests") {
     )
 }
 
+tasks.matching { it.name.contains("GenerateSPMPackage") }.configureEach {
+    doLast {
+        val packageSwiftFile =
+            layout.buildDirectory
+                .file("SPMPackage/macosArm64/Debug/Package.swift")
+                .get()
+                .asFile
+        if (packageSwiftFile.exists()) {
+            val content = packageSwiftFile.readText()
+            if (!content.contains("platforms:")) {
+                packageSwiftFile.writeText(
+                    content.replaceFirst(
+                        Regex("(name:\\s*\"[^\"]*\",)"),
+                        "\$1\n    platforms: [.macOS(.v14)],",
+                    ),
+                )
+            }
+        }
+    }
+}
+
 // Swift Export smoke test — produces the SPM package via embedSwiftExportForXcode
 // (spawned with the Xcode-style env it requires) and runs `swift test` against it,
 // so Swift Export breakage surfaces locally, not only in the swift.yml CI job.
@@ -953,23 +974,6 @@ tasks.register("swiftExportSmokeTest") {
                     ),
                 )
             }.assertNormalExitValue()
-
-        val generatedPackageSwift =
-            layout.buildDirectory
-                .file("SPMPackage/macosArm64/Debug/Package.swift")
-                .get()
-                .asFile
-        if (generatedPackageSwift.exists()) {
-            val text = generatedPackageSwift.readText()
-            if (!text.contains("platforms:")) {
-                generatedPackageSwift.writeText(
-                    text.replaceFirst(
-                        Regex("(name:\\s*\"[^\"]*\",)"),
-                        "\$1\n    platforms: [.macOS(.v14)],",
-                    ),
-                )
-            }
-        }
 
         execOperations
             .exec {

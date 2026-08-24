@@ -15,8 +15,42 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 
 class LibTest {
+    @Test
+    fun allTests() {
+        testTextSetAndGet()
+        testUtf8Text()
+        testClear()
+        testHtmlWithoutAltText()
+        testHtmlWithAltText()
+        testFileList()
+        testImageData()
+        testLinuxClipboardKinds()
+        testMultipleClipboards()
+    }
+
+    @Test
+    fun multipleClipboardsAtOnce() {
+        val clipboards = (1..10).map { Clipboard.new() }
+        for ((idx, ctx) in clipboards.withIndex()) {
+            ctx.setText("content $idx")
+            assertEquals("content $idx", ctx.getText())
+        }
+    }
+
+    @Test
+    fun clipboardTraitConsistently() {
+        assertSendSync()
+    }
+
+    @Test
+    fun assertSendSync() {
+        val ctx = Clipboard.new()
+        assertNotNull(ctx)
+    }
+
     @Test
     fun testTextSetAndGet() {
         val ctx = Clipboard.create()
