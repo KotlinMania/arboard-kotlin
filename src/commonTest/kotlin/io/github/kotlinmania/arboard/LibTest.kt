@@ -18,6 +18,13 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
 class LibTest {
+    companion object {
+        private const val TEXT1: String = "I'm a little teapot,"
+        private const val TEXT2: String = "short and stout,"
+        private const val TEXT3: String = "here is my handle"
+        private const val THREAD_COUNT: Int = 10
+    }
+
     @Test
     fun allTests() {
         testTextSetAndGet()
