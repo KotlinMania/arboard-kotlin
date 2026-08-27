@@ -1,4 +1,4 @@
-// port-lint: source common.rs
+// port-lint: source arboard/src/common.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
