@@ -5,12 +5,12 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 8/8 (100.0%)
-- **Function parity:** 61/126 matched (target 123) — 48.4%
-- **Class/type parity:** 13/41 matched (target 35) — 31.7%
-- **Combined symbol parity:** 74/167 matched (target 158) — 44.3%
-- **Average inline-code cosine:** 0.23 (function body across 6 matched files)
-- **Average documentation cosine:** 0.45 (doc text across 6 matched files)
-- **Cheat-zeroed Files:** 2
+- **Function parity:** 95/126 matched (target 158) — 75.4%
+- **Class/type parity:** 22/41 matched (target 49) — 53.7%
+- **Combined symbol parity:** 117/167 matched (target 207) — 70.1%
+- **Average inline-code cosine:** 0.29 (function body across 6 matched files)
+- **Average documentation cosine:** 0.49 (doc text across 6 matched files)
+- **Cheat-zeroed Files:** 3
 - **Critical Issues:** 8 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
@@ -29,60 +29,62 @@ Every matched file is listed below with function and type symbol parity.
 
 ### 1. platform.windows
 
-- **Target:** `platform.Windows`
-- **Similarity:** 0.08
+- **Target:** `platform.Windows [ZERO]`
+- **Similarity:** 0.00
 - **Dependents:** 0
-- **Priority Score:** 304009.2
-- **Functions:** 9/32 matched (target 14)
-- **Missing functions:** `add_cf_dibv5`, `add_png_file`, `maybe_tweak_header`, `read_cf_dibv5`, `read_png`, `rgba_to_win`, `flip_v`, `win_to_rgba`, `convert_bytes_to_u32s`, `global_alloc`, `global_lock`, `global_unlock_checked`, `last_error`, `failure`, `drop`, `open`, `add_clipboard_exclusions`, `exclude_from_monitoring`, `exclude_from_cloud`, `exclude_from_history`, `wrap_html`, `to_final_path_wide`, `fill_utf16_buf`
-- **Types:** 1/8 matched (target 3)
-- **Missing types:** `ImageDataCow`, `ResultValue`, `Clipboard`, `OpenClipboard`, `Get`, `Set`, `Clear`
+- **Priority Score:** 264010.0
+- **Functions:** 10/32 matched (target 15)
+- **Missing functions:** `add_cf_dibv5`, `add_png_file`, `maybe_tweak_header`, `read_cf_dibv5`, `read_png`, `rgba_to_win`, `flip_v`, `win_to_rgba`, `convert_bytes_to_u32s`, `global_alloc`, `global_lock`, `global_unlock_checked`, `last_error`, `failure`, `drop`, `add_clipboard_exclusions`, `exclude_from_monitoring`, `exclude_from_cloud`, `exclude_from_history`, `wrap_html`, `to_final_path_wide`, `fill_utf16_buf`
+- **Types:** 4/8 matched
+- **Missing types:** `Clipboard`, `Get`, `Set`, `Clear`
 - **Tests:** 3/4 matched
 
-### 2. linux.x11
+### 2. platform.osx
 
-- **Target:** `linux.X11`
-- **Similarity:** 0.06
+- **Target:** `platform.Osx`
+- **Similarity:** 0.11
 - **Dependents:** 0
-- **Priority Score:** 303609.4
-- **Functions:** 6/27 matched (target 11)
-- **Missing functions:** `write`, `read`, `read_single`, `atom_of`, `selection_of`, `kind_of`, `is_owner`, `atom_name`, `atom_name_dbg`, `handle_read_selection_notify`, `handle_read_property_notify`, `handle_selection_request`, `ask_clipboard_manager_to_request_our_data`, `serve_requests`, `handover_finished`, `add_clipboard_exclusions`, `get_text`, `get_html`, `get_image`, `get_file_list`, `drop`
-- **Types:** 0/9 matched (target 2)
-- **Missing types:** `Result`, `ManagerHandoverState`, `GlobalClipboard`, `XContext`, `Inner`, `Selection`, `ClipboardData`, `ReadSelNotifyResult`, `Clipboard`
+- **Priority Score:** 81608.9
+- **Functions:** 7/11 matched (target 12)
+- **Missing functions:** `image_from_pixels`, `release`, `add_clipboard_exclusions`, `exclude_from_history`
+- **Types:** 1/5 matched (target 2)
+- **Missing types:** `Clipboard`, `Get`, `Set`, `Clear`
 
 ### 3. linux.mod
 
 - **Target:** `linux.Mod [STUB]`
 - **Similarity:** 0.00
 - **Dependents:** 0
-- **Priority Score:** 132510.0
-- **Functions:** 9/16 matched
-- **Missing functions:** `into_unknown`, `encode_as_png`, `paths_from_uri_list`, `paths_to_uri_list`, `wait_until`, `exclude_from_history`, `clear_inner`
-- **Types:** 3/9 matched (target 6)
-- **Missing types:** `LinuxClipboardKind`, `Clipboard`, `Get`, `WaitConfig`, `Set`, `Clear`
+- **Priority Score:** 72510.0
+- **Functions:** 14/16 matched (target 21)
+- **Missing functions:** `into_unknown`, `encode_as_png`
+- **Types:** 4/9 matched (target 10)
+- **Missing types:** `LinuxClipboardKind`, `Clipboard`, `Get`, `Set`, `Clear`
 - **Tests:** 1/1 matched
 
-### 4. linux.wayland
+### 4. linux.x11
+
+- **Target:** `linux.X11`
+- **Similarity:** 0.25
+- **Dependents:** 0
+- **Priority Score:** 63607.5
+- **Functions:** 25/27 matched (target 30)
+- **Missing functions:** `serve_requests`, `handover_finished`
+- **Types:** 5/9 matched (target 7)
+- **Missing types:** `GlobalClipboard`, `XContext`, `Inner`, `Clipboard`
+- **Lint issues:** 3
+
+### 5. linux.wayland
 
 - **Target:** `linux.Wayland`
-- **Similarity:** 0.11
+- **Similarity:** 0.35
 - **Dependents:** 0
-- **Priority Score:** 111708.9
-- **Functions:** 6/15 matched (target 11)
-- **Missing functions:** `try_into`, `add_clipboard_exclusions`, `handle_copy_error`, `handle_paste_error`, `handle_clipboard_read`, `get_text`, `get_html`, `get_image`, `get_file_list`
+- **Priority Score:** 31706.5
+- **Functions:** 14/15 matched (target 20)
+- **Missing functions:** `handle_clipboard_read`
 - **Types:** 0/2 matched
 - **Missing types:** `Clipboard`, `Error`
-
-### 5. platform.osx
-
-- **Target:** `platform.Osx`
-- **Similarity:** 0.09
-- **Dependents:** 0
-- **Priority Score:** 91609.1
-- **Functions:** 6/11 matched
-- **Missing functions:** `image_from_pixels`, `release`, `string_from_type`, `add_clipboard_exclusions`, `exclude_from_history`
-- **Types:** 1/5 matched (target 2)
-- **Missing types:** `Clipboard`, `Get`, `Set`, `Clear`
+- **Lint issues:** 1
 
 ### 6. lib
 
