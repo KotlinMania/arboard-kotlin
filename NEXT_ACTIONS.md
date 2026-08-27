@@ -5,9 +5,9 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 8/8 (100.0%)
-- **Function parity:** 57/126 matched (target 118) — 45.2%
-- **Class/type parity:** 13/41 matched (target 32) — 31.7%
-- **Combined symbol parity:** 70/167 matched (target 150) — 41.9%
+- **Function parity:** 61/126 matched (target 123) — 48.4%
+- **Class/type parity:** 13/41 matched (target 35) — 31.7%
+- **Combined symbol parity:** 74/167 matched (target 158) — 44.3%
 - **Average inline-code cosine:** 0.23 (function body across 6 matched files)
 - **Average documentation cosine:** 0.45 (doc text across 6 matched files)
 - **Cheat-zeroed Files:** 2
@@ -30,14 +30,14 @@ Every matched file is listed below with function and type symbol parity.
 ### 1. platform.windows
 
 - **Target:** `platform.Windows`
-- **Similarity:** 0.06
+- **Similarity:** 0.08
 - **Dependents:** 0
-- **Priority Score:** 334009.4
-- **Functions:** 6/32 matched (target 11)
-- **Missing functions:** `add_cf_dibv5`, `add_png_file`, `maybe_tweak_header`, `read_cf_dibv5`, `read_png`, `rgba_to_win`, `flip_v`, `win_to_rgba`, `convert_bytes_to_u32s`, `conversion_between_win_and_rgba`, `firefox_dibv5`, `chrome_dibv5`, `global_alloc`, `global_lock`, `global_unlock_checked`, `last_error`, `failure`, `drop`, `open`, `add_clipboard_exclusions`, `exclude_from_monitoring`, `exclude_from_cloud`, `exclude_from_history`, `wrap_html`, `to_final_path_wide`, `fill_utf16_buf`
-- **Types:** 1/8 matched (target 2)
+- **Priority Score:** 304009.2
+- **Functions:** 9/32 matched (target 14)
+- **Missing functions:** `add_cf_dibv5`, `add_png_file`, `maybe_tweak_header`, `read_cf_dibv5`, `read_png`, `rgba_to_win`, `flip_v`, `win_to_rgba`, `convert_bytes_to_u32s`, `global_alloc`, `global_lock`, `global_unlock_checked`, `last_error`, `failure`, `drop`, `open`, `add_clipboard_exclusions`, `exclude_from_monitoring`, `exclude_from_cloud`, `exclude_from_history`, `wrap_html`, `to_final_path_wide`, `fill_utf16_buf`
+- **Types:** 1/8 matched (target 3)
 - **Missing types:** `ImageDataCow`, `ResultValue`, `Clipboard`, `OpenClipboard`, `Get`, `Set`, `Clear`
-- **Tests:** 0/4 matched
+- **Tests:** 3/4 matched
 
 ### 2. linux.x11
 
@@ -55,12 +55,12 @@ Every matched file is listed below with function and type symbol parity.
 - **Target:** `linux.Mod [STUB]`
 - **Similarity:** 0.00
 - **Dependents:** 0
-- **Priority Score:** 142510.0
-- **Functions:** 8/16 matched (target 15)
-- **Missing functions:** `into_unknown`, `encode_as_png`, `paths_from_uri_list`, `paths_to_uri_list`, `wait_until`, `exclude_from_history`, `clear_inner`, `test_decoding_uri_list`
-- **Types:** 3/9 matched (target 5)
+- **Priority Score:** 132510.0
+- **Functions:** 9/16 matched
+- **Missing functions:** `into_unknown`, `encode_as_png`, `paths_from_uri_list`, `paths_to_uri_list`, `wait_until`, `exclude_from_history`, `clear_inner`
+- **Types:** 3/9 matched (target 6)
 - **Missing types:** `LinuxClipboardKind`, `Clipboard`, `Get`, `WaitConfig`, `Set`, `Clear`
-- **Tests:** 0/1 matched
+- **Tests:** 1/1 matched
 
 ### 4. linux.wayland
 
@@ -113,9 +113,9 @@ Every matched file is listed below with function and type symbol parity.
 - **Similarity:** 0.00
 - **Dependents:** 0
 - **Priority Score:** 10.0
-- **Functions:** 0/0 matched
+- **Functions:** 0/0 matched (target 1)
 - **Missing functions:** _none_
-- **Types:** 0/0 matched (target 1)
+- **Types:** 0/0 matched (target 2)
 - **Missing types:** _none_
 
 ## Success Criteria

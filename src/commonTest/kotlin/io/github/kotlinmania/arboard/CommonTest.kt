@@ -1,4 +1,4 @@
-// port-lint: source common.rs
+// port-lint: tests common.rs
 package io.github.kotlinmania.arboard
 
 import kotlin.test.Test
@@ -30,7 +30,7 @@ class CommonTest {
     }
 
     @Test
-    fun unknownErrorsCompareByDescription() {
+    fun unknownErrorsCompareByDetails() {
         assertEquals(Error.Unknown("same"), Error.Unknown("same"))
         assertNotEquals(Error.Unknown("same"), Error.Unknown("different"))
     }

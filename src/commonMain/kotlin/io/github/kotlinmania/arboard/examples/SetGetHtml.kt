@@ -1,4 +1,4 @@
-// port-lint: source examples/set_get_html.rs
+// port-lint: source arboard/examples/set_get_html.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
