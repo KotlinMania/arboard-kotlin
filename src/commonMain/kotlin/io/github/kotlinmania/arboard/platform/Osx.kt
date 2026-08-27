@@ -82,6 +82,13 @@ public class OsxClipboard internal constructor() {
         image = null
     }
 
+    internal fun stringFromType(type: String): String =
+        when (type) {
+            "public.utf8-plain-text", "NSStringPboardType" -> text()
+            "public.html", "NSHTMLPboardType" -> html()
+            else -> throw Error.ContentNotAvailable
+        }
+
     public companion object {
         public fun new(): OsxClipboard = OsxClipboard()
     }

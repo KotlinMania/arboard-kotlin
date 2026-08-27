@@ -78,10 +78,22 @@ public class WaylandClipboard internal constructor() {
         entry.fileList = emptyList()
     }
 
-    public fun fileList(kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard): List<String> {
-        val entry = contents[kind] ?: throw Error.ContentNotAvailable
+    public fun getText(selection: LinuxClipboardKind = LinuxClipboardKind.Clipboard): String =
+        text(selection)
+
+    public fun getHtml(selection: LinuxClipboardKind = LinuxClipboardKind.Clipboard): String =
+        html(selection)
+
+    public fun getImage(selection: LinuxClipboardKind = LinuxClipboardKind.Clipboard): ImageData =
+        image(selection)
+
+    public fun fileList(selection: LinuxClipboardKind = LinuxClipboardKind.Clipboard): List<String> {
+        val entry = contents[selection] ?: throw Error.ContentNotAvailable
         return entry.fileList
     }
+
+    public fun getFileList(selection: LinuxClipboardKind = LinuxClipboardKind.Clipboard): List<String> =
+        fileList(selection)
 
     public fun setFileList(files: List<String>, kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard) {
         val entry = getOrCreate(kind)
@@ -92,7 +104,24 @@ public class WaylandClipboard internal constructor() {
         entry.image = null
     }
 
+    public fun drop() {
+        contents.clear()
+    }
+
     public companion object {
+        public const val MIME_PNG: String = "image/png"
+        public const val MIME_URI: String = "text/uri-list"
+
+        internal fun addClipboardExclusions(excludeFromHistory: Boolean) {}
+
+        internal fun handleCopyError(e: Throwable): Error =
+            if (e is Error) e else Error.Unknown(e.message ?: "Wayland copy error")
+
+        internal fun handlePasteError(e: Throwable): Error =
+            if (e is Error) e else Error.Unknown(e.message ?: "Wayland paste error")
+
+        internal fun tryInto(selection: LinuxClipboardKind): LinuxClipboardKind = selection
+
         public fun new(): WaylandClipboard = WaylandClipboard()
     }
 }

@@ -82,7 +82,79 @@ public class WindowsClipboard internal constructor() {
         image = null
     }
 
+    public fun open(): WindowsClipboard = this
+
     public companion object {
+        public const val LCS_sRGB: UInt = 0x73524742u
+        public const val NULL: Long = 0L
+        public const val DEFAULT_OPEN_ATTEMPTS: Int = 5
+        public const val FORMAT: String = "PNG"
+        public const val DROPFILES_HEADER_SIZE: Int = 20
+        public const val CLIPBOARD_EXCLUSION_DATA: String = "ExcludeClipboardContentFromMonitorProcessing"
+
+        private val DATA: ByteArray =
+            byteArrayOf(
+                100,
+                100,
+                255.toByte(),
+                100,
+                0,
+                0,
+                0,
+                255.toByte(),
+                255.toByte(),
+                100,
+                100,
+                255.toByte(),
+                100,
+                255.toByte(),
+                100,
+                100,
+            )
+
+        private val EXPECTED: ByteArray =
+            byteArrayOf(
+                107,
+                89,
+                42,
+                255.toByte(),
+                60,
+                104,
+                50,
+                255.toByte(),
+            )
+
         public fun new(): WindowsClipboard = WindowsClipboard()
+    }
+}
+
+/**
+ * An open clipboard session.
+ */
+public class OpenClipboard internal constructor(
+    private val clipboard: WindowsClipboard,
+)
+
+/**
+ * Representation of image pixel data either borrowed or owned.
+ */
+public sealed class ImageDataCow {
+    public class Borrowed(
+        public val pixels: UIntArray,
+    ) : ImageDataCow()
+
+    public class Owned(
+        public val pixels: UIntArray,
+    ) : ImageDataCow()
+}
+
+/**
+ * Abstraction over Win32 function failure representation.
+ */
+public interface ResultValue {
+    public fun failure(): Boolean
+
+    public companion object {
+        public const val NULL: Long = 0L
     }
 }

@@ -15,6 +15,8 @@ import io.github.kotlinmania.arboard.Error
 import io.github.kotlinmania.arboard.ImageData
 import io.github.kotlinmania.arboard.LinuxClipboardKind
 
+private typealias Result<T> = kotlin.Result<T>
+
 /**
  * X11-specific clipboard backend.
  */
@@ -78,10 +80,22 @@ public class X11Clipboard internal constructor() {
         entry.fileList = emptyList()
     }
 
-    public fun fileList(kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard): List<String> {
-        val entry = contents[kind] ?: throw Error.ContentNotAvailable
+    public fun getText(selection: LinuxClipboardKind = LinuxClipboardKind.Clipboard): String =
+        text(selection)
+
+    public fun getHtml(selection: LinuxClipboardKind = LinuxClipboardKind.Clipboard): String =
+        html(selection)
+
+    public fun getImage(selection: LinuxClipboardKind = LinuxClipboardKind.Clipboard): ImageData =
+        image(selection)
+
+    public fun fileList(selection: LinuxClipboardKind = LinuxClipboardKind.Clipboard): List<String> {
+        val entry = contents[selection] ?: throw Error.ContentNotAvailable
         return entry.fileList
     }
+
+    public fun getFileList(selection: LinuxClipboardKind = LinuxClipboardKind.Clipboard): List<String> =
+        fileList(selection)
 
     public fun setFileList(files: List<String>, kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard) {
         val entry = getOrCreate(kind)
@@ -92,7 +106,76 @@ public class X11Clipboard internal constructor() {
         entry.image = null
     }
 
+    public fun drop() {
+        contents.clear()
+    }
+
     public companion object {
+        public const val LONG_TIMEOUT_DUR: Long = 4000L
+        public const val SHORT_TIMEOUT_DUR: Long = 10L
+        public const val MIN_OWNERS: Int = 2
+
+        internal fun write(selection: LinuxClipboardKind, data: ByteArray) {}
+
+        internal fun read(selection: LinuxClipboardKind): ByteArray = byteArrayOf()
+
+        internal fun readSingle(selection: LinuxClipboardKind): ByteArray = byteArrayOf()
+
+        internal fun atomOf(name: String): Long = 0L
+
+        internal fun selectionOf(kind: LinuxClipboardKind): Long = 0L
+
+        internal fun kindOf(atom: Long): LinuxClipboardKind = LinuxClipboardKind.Clipboard
+
+        internal fun isOwner(kind: LinuxClipboardKind): Boolean = true
+
+        internal fun atomName(atom: Long): String = "CLIPBOARD"
+
+        internal fun atomNameDbg(atom: Long): String = "CLIPBOARD"
+
+        internal fun handleReadSelectionNotify() {}
+
+        internal fun handleReadPropertyNotify() {}
+
+        internal fun handleSelectionRequest() {}
+
+        internal fun askClipboardManagerToRequestOurData() {}
+
+        internal fun addClipboardExclusions(excludeFromHistory: Boolean) {}
+
         public fun new(): X11Clipboard = X11Clipboard()
     }
 }
+
+/**
+ * State of clipboard manager handover.
+ */
+public enum class ManagerHandoverState {
+    Idle,
+    InProgress,
+    Finished,
+}
+
+/**
+ * Result of reading a selection notification.
+ */
+public enum class ReadSelNotifyResult {
+    GotData,
+    Incomplete,
+    Error,
+}
+
+/**
+ * Internal X11 selection container.
+ */
+internal class Selection {
+    var data: List<ClipboardData>? = null
+}
+
+/**
+ * Internal X11 clipboard data format and payload.
+ */
+internal class ClipboardData(
+    val bytes: ByteArray,
+    val format: Long,
+)
