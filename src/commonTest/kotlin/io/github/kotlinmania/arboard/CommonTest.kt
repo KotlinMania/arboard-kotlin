@@ -30,7 +30,7 @@ class CommonTest {
     }
 
     @Test
-    fun unknownErrorsCompareByDescription() {
+    fun unknownErrorsCompareByDetails() {
         assertEquals(Error.Unknown("same"), Error.Unknown("same"))
         assertNotEquals(Error.Unknown("same"), Error.Unknown("different"))
     }
