@@ -1,4 +1,4 @@
-// port-lint: source platform/osx.rs
+// port-lint: source arboard/src/platform/osx.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 

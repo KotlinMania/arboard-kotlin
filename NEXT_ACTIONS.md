@@ -4,14 +4,14 @@ Based on AST analysis, here are the concrete next steps.
 
 ## Summary
 
-- **Files Present:** 8/8 (100.0%)
-- **Function parity:** 61/126 matched (target 123) — 48.4%
-- **Class/type parity:** 13/41 matched (target 35) — 31.7%
-- **Combined symbol parity:** 74/167 matched (target 158) — 44.3%
-- **Average inline-code cosine:** 0.23 (function body across 6 matched files)
-- **Average documentation cosine:** 0.45 (doc text across 6 matched files)
-- **Cheat-zeroed Files:** 2
-- **Critical Issues:** 8 files with <0.60 function similarity
+- **Files Present:** 13/13 (100.0%)
+- **Function parity:** 66/131 matched (target 128) — 50.4%
+- **Class/type parity:** 13/41 matched (target 40) — 31.7%
+- **Combined symbol parity:** 79/172 matched (target 168) — 45.9%
+- **Average inline-code cosine:** 0.44 (function body across 10 matched files)
+- **Average documentation cosine:** 0.21 (doc text across 10 matched files)
+- **Cheat-zeroed Files:** 3
+- **Critical Issues:** 9 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -84,19 +84,19 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/5 matched (target 2)
 - **Missing types:** `Clipboard`, `Get`, `Set`, `Clear`
 
-### 6. lib
+### 6. arboard.lib
 
-- **Target:** `arboard.Lib`
-- **Similarity:** 0.55
+- **Target:** `arboard.Lib [STUB]`
+- **Similarity:** 0.00
 - **Dependents:** 0
-- **Priority Score:** 2304.5
+- **Priority Score:** 2310.0
 - **Functions:** 19/19 matched (target 42)
 - **Missing functions:** _none_
 - **Types:** 4/4 matched (target 7)
 - **Missing types:** _none_
 - **Tests:** 4/4 matched
 
-### 7. common
+### 7. arboard.common
 
 - **Target:** `arboard.Common`
 - **Similarity:** 0.50
@@ -107,7 +107,67 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 4/4 matched (target 11)
 - **Missing types:** _none_
 
-### 8. platform.mod
+### 8. examples.daemonize
+
+- **Target:** `examples.Daemonize`
+- **Similarity:** 0.50
+- **Dependents:** 0
+- **Priority Score:** 105.0
+- **Functions:** 1/1 matched
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 1)
+- **Missing types:** _none_
+- **Lint issues:** 1
+
+### 9. examples.set_image
+
+- **Target:** `examples.SetImage`
+- **Similarity:** 0.64
+- **Dependents:** 0
+- **Priority Score:** 103.6
+- **Functions:** 1/1 matched
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 1)
+- **Missing types:** _none_
+- **Lint issues:** 1
+
+### 10. examples.set_get_html
+
+- **Target:** `examples.SetGetHtml`
+- **Similarity:** 0.79
+- **Dependents:** 0
+- **Priority Score:** 102.1
+- **Functions:** 1/1 matched
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 1)
+- **Missing types:** _none_
+- **Lint issues:** 1
+
+### 11. examples.get_image
+
+- **Target:** `examples.GetImage`
+- **Similarity:** 0.79
+- **Dependents:** 0
+- **Priority Score:** 102.1
+- **Functions:** 1/1 matched
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 1)
+- **Missing types:** _none_
+- **Lint issues:** 1
+
+### 12. examples.hello_world
+
+- **Target:** `examples.HelloWorld`
+- **Similarity:** 0.84
+- **Dependents:** 0
+- **Priority Score:** 101.6
+- **Functions:** 1/1 matched
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 1)
+- **Missing types:** _none_
+- **Lint issues:** 1
+
+### 13. platform.mod
 
 - **Target:** `platform.Mod [STUB]`
 - **Similarity:** 0.00
