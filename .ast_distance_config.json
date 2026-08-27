@@ -16,10 +16,5 @@
     "todos": true,
     "lint": true
   },
-  "reexport_modules": [
-    "mod.rs",
-    "platform.mod",
-    "platform/mod.rs",
-    "platform/linux/mod.rs"
-  ]
+  "reexport_modules": []
 }
