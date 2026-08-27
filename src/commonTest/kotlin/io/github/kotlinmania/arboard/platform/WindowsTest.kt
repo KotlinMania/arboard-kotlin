@@ -8,12 +8,25 @@ import kotlin.test.assertEquals
 class WindowsTest {
     @Test
     fun conversionBetweenWinAndRgba() {
-        val data = byteArrayOf(
-            100, 100, 255.toByte(), 100,
-            0, 0, 0, 255.toByte(),
-            255.toByte(), 100, 100, 255.toByte(),
-            100, 255.toByte(), 100, 100
-        )
+        val data =
+            byteArrayOf(
+                100,
+                100,
+                255.toByte(),
+                100,
+                0,
+                0,
+                0,
+                255.toByte(),
+                255.toByte(),
+                100,
+                100,
+                255.toByte(),
+                100,
+                255.toByte(),
+                100,
+                100,
+            )
         val copy = data.copyOf()
         assertContentEquals(data, copy)
     }

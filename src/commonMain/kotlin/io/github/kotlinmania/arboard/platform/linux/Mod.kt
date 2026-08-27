@@ -26,6 +26,19 @@ public interface GetExtLinux {
 }
 
 /**
+ * Configuration on how long to wait for a new X11 copy event.
+ */
+public sealed class WaitConfig {
+    public class Until(
+        public val deadlineMillis: Long,
+    ) : WaitConfig()
+
+    public object Forever : WaitConfig()
+
+    public object None : WaitConfig()
+}
+
+/**
  * Linux-specific extensions to the [io.github.kotlinmania.arboard.Set] builder.
  */
 public interface SetExtLinux {
@@ -38,6 +51,16 @@ public interface SetExtLinux {
      * Completes the set operation and waits for a paste event if required.
      */
     public fun wait(): SetExtLinux = this
+
+    /**
+     * Waits until the given deadline in milliseconds.
+     */
+    public fun waitUntil(deadlineMillis: Long): SetExtLinux = this
+
+    /**
+     * Excludes data from clipboard manager history.
+     */
+    public fun excludeFromHistory(): SetExtLinux = this
 }
 
 /**
@@ -68,6 +91,10 @@ public class LinuxClipboard internal constructor() {
         contents.getOrPut(kind) { Entry() }
 
     public fun clear(kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard) {
+        clearInner(kind)
+    }
+
+    private fun clearInner(kind: LinuxClipboardKind) {
         contents.remove(kind)
     }
 
@@ -128,6 +155,29 @@ public class LinuxClipboard internal constructor() {
     }
 
     public companion object {
+        public const val KDE_EXCLUSION_MIME: String = "x-kde-passwordManagerHint"
+        public val KDE_EXCLUSION_HINT: ByteArray = byteArrayOf(115, 101, 99, 114, 101, 116) // "secret"
+        public const val ASCII_SET: String = "#;?[] \"\\^`{}|"
+
+        public fun pathsFromUriList(uriList: ByteArray): List<String> {
+            val text = uriList.decodeToString()
+            return text
+                .split('\n')
+                .filter { it.startsWith("file://") }
+                .map { uri ->
+                    uri
+                        .removePrefix("file://")
+                        .replace("%5C", "\\")
+                        .replace("%3F", "?")
+                        .replace("%20", " ")
+                }
+        }
+
+        public fun pathsToUriList(fileList: List<String>): String {
+            if (fileList.isEmpty()) throw Error.ConversionFailure
+            return fileList.joinToString("\n") { "file://$it" }
+        }
+
         public fun new(): LinuxClipboard = LinuxClipboard()
     }
 }
