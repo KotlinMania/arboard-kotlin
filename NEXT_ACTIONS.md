@@ -4,14 +4,14 @@ Based on AST analysis, here are the concrete next steps.
 
 ## Summary
 
-- **Files Present:** 8/8 (100.0%)
-- **Function parity:** 95/126 matched (target 158) — 75.4%
-- **Class/type parity:** 22/41 matched (target 49) — 53.7%
-- **Combined symbol parity:** 117/167 matched (target 207) — 70.1%
-- **Average inline-code cosine:** 0.29 (function body across 6 matched files)
-- **Average documentation cosine:** 0.49 (doc text across 6 matched files)
+- **Files Present:** 13/13 (100.0%)
+- **Function parity:** 100/131 matched (target 163) — 76.3%
+- **Class/type parity:** 22/41 matched (target 54) — 53.7%
+- **Combined symbol parity:** 122/172 matched (target 217) — 70.9%
+- **Average inline-code cosine:** 0.48 (function body across 11 matched files)
+- **Average documentation cosine:** 0.29 (doc text across 11 matched files)
 - **Cheat-zeroed Files:** 3
-- **Critical Issues:** 8 files with <0.60 function similarity
+- **Critical Issues:** 9 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -29,7 +29,7 @@ Every matched file is listed below with function and type symbol parity.
 
 ### 1. platform.windows
 
-- **Target:** `platform.Windows [ZERO]`
+- **Target:** `platform.Windows [ZERO] [PROVENANCE-FALLBACK]`
 - **Similarity:** 0.00
 - **Dependents:** 0
 - **Priority Score:** 264010.0
@@ -38,10 +38,15 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 4/8 matched
 - **Missing types:** `Clipboard`, `Get`, `Set`, `Clear`
 - **Tests:** 3/4 matched
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `platform/windows.rs` vs expected `platform/windows.rs`
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:platform/windows.rs` vs expected `platform/windows.rs`
+- **Proposed provenance header:** `// port-lint: source platform/windows.rs` (current: `// port-lint: source platform/windows.rs`)
+- **Proposed provenance header:** `// port-lint: tests platform/windows.rs` (current: `// port-lint: tests platform/windows.rs`)
+- **Lint issues:** 2
 
 ### 2. platform.osx
 
-- **Target:** `platform.Osx`
+- **Target:** `platform.Osx [PROVENANCE-FALLBACK]`
 - **Similarity:** 0.11
 - **Dependents:** 0
 - **Priority Score:** 81608.9
@@ -49,10 +54,13 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** `image_from_pixels`, `release`, `add_clipboard_exclusions`, `exclude_from_history`
 - **Types:** 1/5 matched (target 2)
 - **Missing types:** `Clipboard`, `Get`, `Set`, `Clear`
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `platform/osx.rs` vs expected `platform/osx.rs`
+- **Proposed provenance header:** `// port-lint: source platform/osx.rs` (current: `// port-lint: source platform/osx.rs`)
+- **Lint issues:** 1
 
 ### 3. linux.mod
 
-- **Target:** `linux.Mod [STUB]`
+- **Target:** `linux.Mod [STUB] [PROVENANCE-FALLBACK]`
 - **Similarity:** 0.00
 - **Dependents:** 0
 - **Priority Score:** 72510.0
@@ -61,10 +69,15 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 4/9 matched (target 10)
 - **Missing types:** `LinuxClipboardKind`, `Clipboard`, `Get`, `Set`, `Clear`
 - **Tests:** 1/1 matched
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `platform/linux/mod.rs` vs expected `platform/linux/mod.rs`
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:platform/linux/mod.rs` vs expected `platform/linux/mod.rs`
+- **Proposed provenance header:** `// port-lint: source platform/linux/mod.rs` (current: `// port-lint: source platform/linux/mod.rs`)
+- **Proposed provenance header:** `// port-lint: tests platform/linux/mod.rs` (current: `// port-lint: tests platform/linux/mod.rs`)
+- **Lint issues:** 2
 
 ### 4. linux.x11
 
-- **Target:** `linux.X11`
+- **Target:** `linux.X11 [PROVENANCE-FALLBACK]`
 - **Similarity:** 0.25
 - **Dependents:** 0
 - **Priority Score:** 63607.5
@@ -72,11 +85,13 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** `serve_requests`, `handover_finished`
 - **Types:** 5/9 matched (target 7)
 - **Missing types:** `GlobalClipboard`, `XContext`, `Inner`, `Clipboard`
-- **Lint issues:** 3
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `platform/linux/x11.rs` vs expected `platform/linux/x11.rs`
+- **Proposed provenance header:** `// port-lint: source platform/linux/x11.rs` (current: `// port-lint: source platform/linux/x11.rs`)
+- **Lint issues:** 4
 
 ### 5. linux.wayland
 
-- **Target:** `linux.Wayland`
+- **Target:** `linux.Wayland [PROVENANCE-FALLBACK]`
 - **Similarity:** 0.35
 - **Dependents:** 0
 - **Priority Score:** 31706.5
@@ -84,11 +99,13 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** `handle_clipboard_read`
 - **Types:** 0/2 matched
 - **Missing types:** `Clipboard`, `Error`
-- **Lint issues:** 1
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `platform/linux/wayland.rs` vs expected `platform/linux/wayland.rs`
+- **Proposed provenance header:** `// port-lint: source platform/linux/wayland.rs` (current: `// port-lint: source platform/linux/wayland.rs`)
+- **Lint issues:** 2
 
-### 6. lib
+### 6. arboard.lib
 
-- **Target:** `arboard.Lib`
+- **Target:** `arboard.Lib [PROVENANCE-FALLBACK]`
 - **Similarity:** 0.55
 - **Dependents:** 0
 - **Priority Score:** 2304.5
@@ -97,10 +114,15 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 4/4 matched (target 7)
 - **Missing types:** _none_
 - **Tests:** 4/4 matched
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `lib.rs` vs expected `lib.rs`
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:lib.rs` vs expected `lib.rs`
+- **Proposed provenance header:** `// port-lint: source lib.rs` (current: `// port-lint: source lib.rs`)
+- **Proposed provenance header:** `// port-lint: tests lib.rs` (current: `// port-lint: tests lib.rs`)
+- **Lint issues:** 2
 
-### 7. common
+### 7. arboard.common
 
-- **Target:** `arboard.Common`
+- **Target:** `arboard.Common [PROVENANCE-FALLBACK]`
 - **Similarity:** 0.50
 - **Dependents:** 0
 - **Priority Score:** 1005.0
@@ -108,10 +130,75 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** _none_
 - **Types:** 4/4 matched (target 11)
 - **Missing types:** _none_
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `common.rs` vs expected `common.rs`
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:common.rs` vs expected `common.rs`
+- **Proposed provenance header:** `// port-lint: source common.rs` (current: `// port-lint: source common.rs`)
+- **Proposed provenance header:** `// port-lint: tests common.rs` (current: `// port-lint: tests common.rs`)
+- **Lint issues:** 2
 
-### 8. platform.mod
+### 8. examples.daemonize
 
-- **Target:** `platform.Mod [STUB]`
+- **Target:** `examples.Daemonize`
+- **Similarity:** 0.50
+- **Dependents:** 0
+- **Priority Score:** 105.0
+- **Functions:** 1/1 matched
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 1)
+- **Missing types:** _none_
+- **Lint issues:** 1
+
+### 9. examples.set_image
+
+- **Target:** `examples.SetImage`
+- **Similarity:** 0.64
+- **Dependents:** 0
+- **Priority Score:** 103.6
+- **Functions:** 1/1 matched
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 1)
+- **Missing types:** _none_
+- **Lint issues:** 1
+
+### 10. examples.set_get_html
+
+- **Target:** `examples.SetGetHtml`
+- **Similarity:** 0.79
+- **Dependents:** 0
+- **Priority Score:** 102.1
+- **Functions:** 1/1 matched
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 1)
+- **Missing types:** _none_
+- **Lint issues:** 1
+
+### 11. examples.get_image
+
+- **Target:** `examples.GetImage`
+- **Similarity:** 0.79
+- **Dependents:** 0
+- **Priority Score:** 102.1
+- **Functions:** 1/1 matched
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 1)
+- **Missing types:** _none_
+- **Lint issues:** 1
+
+### 12. examples.hello_world
+
+- **Target:** `examples.HelloWorld`
+- **Similarity:** 0.84
+- **Dependents:** 0
+- **Priority Score:** 101.6
+- **Functions:** 1/1 matched
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 1)
+- **Missing types:** _none_
+- **Lint issues:** 1
+
+### 13. platform.mod
+
+- **Target:** `platform.Mod [STUB] [PROVENANCE-FALLBACK]`
 - **Similarity:** 0.00
 - **Dependents:** 0
 - **Priority Score:** 10.0
@@ -119,6 +206,11 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** _none_
 - **Types:** 0/0 matched (target 2)
 - **Missing types:** _none_
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `platform/mod.rs` vs expected `platform/mod.rs`
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:platform/mod.rs` vs expected `platform/mod.rs`
+- **Proposed provenance header:** `// port-lint: source platform/mod.rs` (current: `// port-lint: source platform/mod.rs`)
+- **Proposed provenance header:** `// port-lint: tests platform/mod.rs` (current: `// port-lint: tests platform/mod.rs`)
+- **Lint issues:** 2
 
 ## Success Criteria
 
