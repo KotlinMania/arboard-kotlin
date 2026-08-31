@@ -1,4 +1,4 @@
-// port-lint: source arboard/src/lib.rs
+// port-lint: source lib.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
@@ -215,7 +215,9 @@ public class Set(
     /**
      * Instructs the operation to wait until ownership is transferred.
      */
-    public fun wait(): Set = this
+    public fun wait(): Set {
+        return this
+    }
 
     /**
      * Instructs the clipboard to exclude the data from history.

@@ -1,4 +1,4 @@
-// port-lint: source arboard/examples/daemonize.rs
+// port-lint: source examples/daemonize.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 

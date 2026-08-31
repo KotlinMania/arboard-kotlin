@@ -1,4 +1,4 @@
-// port-lint: source arboard/src/platform/windows.rs
+// port-lint: source platform/windows.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
@@ -85,7 +85,7 @@ public class WindowsClipboard internal constructor() {
     public fun open(): WindowsClipboard = this
 
     public companion object {
-        public const val LCS_sRGB: UInt = 0x73524742u
+        public const val LCS_SRGB: UInt = 0x73524742u
         public const val NULL: Long = 0L
         public const val DEFAULT_OPEN_ATTEMPTS: Int = 5
         public const val FORMAT: String = "PNG"
