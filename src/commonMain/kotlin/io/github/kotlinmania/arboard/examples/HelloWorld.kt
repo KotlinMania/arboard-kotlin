@@ -1,4 +1,4 @@
-// port-lint: source examples/hello_world.rs
+// port-lint: source arboard/examples/hello_world.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
