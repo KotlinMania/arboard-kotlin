@@ -1,4 +1,4 @@
-// port-lint: tests platform/windows.rs
+// port-lint: tests arboard/src/platform/windows.rs
 package io.github.kotlinmania.arboard.platform
 
 import kotlin.test.Test
