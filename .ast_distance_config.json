@@ -3,7 +3,7 @@
   "parity_mode": false,
   "name": "arboard-kotlin",
   "source": {
-    "path": "tmp/arboard/src",
+    "path": "tmp",
     "lang": "rust"
   },
   "target": {
