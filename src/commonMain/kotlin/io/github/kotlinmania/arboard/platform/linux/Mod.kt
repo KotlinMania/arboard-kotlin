@@ -1,4 +1,4 @@
-// port-lint: source arboard/src/platform/linux/mod.rs
+// port-lint: source platform/linux/mod.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
@@ -16,13 +16,30 @@ import io.github.kotlinmania.arboard.ImageData
 import io.github.kotlinmania.arboard.LinuxClipboardKind
 
 /**
+ * Converts an error description into an Unknown error.
+ */
+public fun intoUnknown(error: Any): Error {
+    return Error.Unknown(error.toString())
+}
+
+/**
+ * Encodes image data as PNG bytes.
+ */
+public fun encodeAsPng(image: ImageData): ByteArray {
+    if (image.bytes.isEmpty() || image.width == 0 || image.height == 0) {
+        throw Error.ConversionFailure
+    }
+    return image.bytes
+}
+
+/**
  * Linux-specific extensions to the [io.github.kotlinmania.arboard.Get] builder.
  */
 public interface GetExtLinux {
     /**
      * Sets which Linux clipboard to read from.
      */
-    public fun clipboard(selection: LinuxClipboardKind): GetExtLinux = this
+    public fun clipboard(selection: LinuxClipboardKind): GetExtLinux
 }
 
 /**
@@ -45,22 +62,22 @@ public interface SetExtLinux {
     /**
      * Sets which Linux clipboard to write to.
      */
-    public fun clipboard(selection: LinuxClipboardKind): SetExtLinux = this
+    public fun clipboard(selection: LinuxClipboardKind): SetExtLinux
 
     /**
      * Completes the set operation and waits for a paste event if required.
      */
-    public fun wait(): SetExtLinux = this
+    public fun wait(): SetExtLinux
 
     /**
      * Waits until the given deadline in milliseconds.
      */
-    public fun waitUntil(deadlineMillis: Long): SetExtLinux = this
+    public fun waitUntil(deadlineMillis: Long): SetExtLinux
 
     /**
      * Excludes data from clipboard manager history.
      */
-    public fun excludeFromHistory(): SetExtLinux = this
+    public fun excludeFromHistory(): SetExtLinux
 }
 
 /**
@@ -70,7 +87,7 @@ public interface ClearExtLinux {
     /**
      * Sets which Linux clipboard to clear.
      */
-    public fun clipboard(selection: LinuxClipboardKind): ClearExtLinux = this
+    public fun clipboard(selection: LinuxClipboardKind): ClearExtLinux
 }
 
 /**
@@ -87,8 +104,9 @@ public class LinuxClipboard internal constructor() {
         var fileList: List<String> = emptyList(),
     )
 
-    private fun getOrCreate(kind: LinuxClipboardKind): Entry =
-        contents.getOrPut(kind) { Entry() }
+    private fun getOrCreate(kind: LinuxClipboardKind): Entry {
+        return contents.getOrPut(kind) { Entry() }
+    }
 
     public fun clear(kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard) {
         clearInner(kind)
@@ -178,6 +196,8 @@ public class LinuxClipboard internal constructor() {
             return fileList.joinToString("\n") { "file://$it" }
         }
 
-        public fun new(): LinuxClipboard = LinuxClipboard()
+        public fun new(): LinuxClipboard {
+            return LinuxClipboard()
+        }
     }
 }
