@@ -1,4 +1,4 @@
-// port-lint: source platform/windows.rs
+// port-lint: source arboard/src/platform/windows.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
