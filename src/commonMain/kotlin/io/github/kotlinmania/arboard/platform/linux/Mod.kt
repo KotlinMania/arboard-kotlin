@@ -18,9 +18,7 @@ import io.github.kotlinmania.arboard.LinuxClipboardKind
 /**
  * Converts an error description into an Unknown error.
  */
-public fun intoUnknown(error: Any): Error {
-    return Error.Unknown(error.toString())
-}
+public fun intoUnknown(error: Any): Error = Error.Unknown(error.toString())
 
 /**
  * Encodes image data as PNG bytes.
@@ -104,9 +102,7 @@ public class LinuxClipboard internal constructor() {
         var fileList: List<String> = emptyList(),
     )
 
-    private fun getOrCreate(kind: LinuxClipboardKind): Entry {
-        return contents.getOrPut(kind) { Entry() }
-    }
+    private fun getOrCreate(kind: LinuxClipboardKind): Entry = contents.getOrPut(kind) { Entry() }
 
     public fun clear(kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard) {
         clearInner(kind)
@@ -196,8 +192,6 @@ public class LinuxClipboard internal constructor() {
             return fileList.joinToString("\n") { "file://$it" }
         }
 
-        public fun new(): LinuxClipboard {
-            return LinuxClipboard()
-        }
+        public fun new(): LinuxClipboard = LinuxClipboard()
     }
 }

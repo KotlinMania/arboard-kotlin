@@ -215,9 +215,7 @@ public class Set(
     /**
      * Instructs the operation to wait until ownership is transferred.
      */
-    public fun wait(): Set {
-        return this
-    }
+    public fun wait(): Set = this
 
     /**
      * Instructs the clipboard to exclude the data from history.
