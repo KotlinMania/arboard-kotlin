@@ -1,4 +1,4 @@
-// port-lint: tests arboard/src/lib.rs
+// port-lint: tests lib.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 

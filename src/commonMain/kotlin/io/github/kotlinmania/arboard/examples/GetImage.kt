@@ -1,4 +1,4 @@
-// port-lint: source arboard/examples/get_image.rs
+// port-lint: source ../examples/get_image.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
