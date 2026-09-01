@@ -1,4 +1,4 @@
-// port-lint: source arboard/src/platform/linux/x11.rs
+// port-lint: source platform/linux/x11.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 

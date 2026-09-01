@@ -1,4 +1,4 @@
-// port-lint: tests arboard/src/platform/linux/mod.rs
+// port-lint: tests platform/linux/mod.rs
 package io.github.kotlinmania.arboard.platform
 
 import kotlin.test.Test

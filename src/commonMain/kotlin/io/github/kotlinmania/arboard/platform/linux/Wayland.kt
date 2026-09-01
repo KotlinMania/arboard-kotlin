@@ -1,4 +1,4 @@
-// port-lint: source arboard/src/platform/linux/wayland.rs
+// port-lint: source platform/linux/wayland.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 

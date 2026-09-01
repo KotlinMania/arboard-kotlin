@@ -1,4 +1,4 @@
-// port-lint: tests arboard/src/common.rs
+// port-lint: tests common.rs
 package io.github.kotlinmania.arboard
 
 import kotlin.test.Test
