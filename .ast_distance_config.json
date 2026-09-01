@@ -20,6 +20,11 @@
     "platform/mod",
     "linux/mod",
     "platform.mod",
-    "linux.mod"
+    "linux.mod",
+    "arboard/src/platform/mod.rs",
+    "arboard/src/platform/linux/mod.rs",
+    "arboard/src/lib.rs",
+    "lib.rs",
+    "lib"
   ]
 }
