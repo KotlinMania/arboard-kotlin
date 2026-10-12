@@ -40,7 +40,7 @@ class LibTest {
 
     @Test
     fun multipleClipboardsAtOnce() {
-        val clipboards = (1..10).map { Clipboard.new() }
+        val clipboards = (1..THREAD_COUNT).map { Clipboard.new() }
         for ((idx, ctx) in clipboards.withIndex()) {
             ctx.setText("content $idx")
             assertEquals("content $idx", ctx.getText())
@@ -163,17 +163,14 @@ class LibTest {
     @Test
     fun testLinuxClipboardKinds() {
         val ctx = Clipboard.create()
-        val text1 = "I'm a little teapot,"
-        val text2 = "short and stout,"
-        val text3 = "here is my handle"
 
-        ctx.set().clipboard(LinuxClipboardKind.Clipboard).text(text1)
-        ctx.set().clipboard(LinuxClipboardKind.Primary).text(text2)
-        ctx.set().clipboard(LinuxClipboardKind.Secondary).text(text3)
+        ctx.set().clipboard(LinuxClipboardKind.Clipboard).text(TEXT1)
+        ctx.set().clipboard(LinuxClipboardKind.Primary).text(TEXT2)
+        ctx.set().clipboard(LinuxClipboardKind.Secondary).text(TEXT3)
 
-        assertEquals(text1, ctx.get().clipboard(LinuxClipboardKind.Clipboard).text())
-        assertEquals(text2, ctx.get().clipboard(LinuxClipboardKind.Primary).text())
-        assertEquals(text3, ctx.get().clipboard(LinuxClipboardKind.Secondary).text())
+        assertEquals(TEXT1, ctx.get().clipboard(LinuxClipboardKind.Clipboard).text())
+        assertEquals(TEXT2, ctx.get().clipboard(LinuxClipboardKind.Primary).text())
+        assertEquals(TEXT3, ctx.get().clipboard(LinuxClipboardKind.Secondary).text())
     }
 
     @Test
