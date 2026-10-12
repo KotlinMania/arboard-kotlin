@@ -143,9 +143,37 @@ public class X11Clipboard internal constructor() {
 
         internal fun addClipboardExclusions(excludeFromHistory: Boolean) {}
 
+        public fun serveRequests(context: Inner) {}
+
+        public fun handoverFinished(clip: Inner, handoverState: ManagerHandoverState) {
+            clip.handoverState = ManagerHandoverState.Finished
+        }
+
         public fun new(): X11Clipboard = X11Clipboard()
     }
 }
+
+/**
+ * X11 connection and window context.
+ */
+public class XContext internal constructor(
+    public val winId: UInt = 0u,
+)
+
+/**
+ * Internal state for X11 clipboard server thread.
+ */
+public class Inner internal constructor(
+    public val server: XContext = XContext(),
+    public var handoverState: ManagerHandoverState = ManagerHandoverState.Idle,
+)
+
+/**
+ * Global clipboard holding inner context and server thread.
+ */
+public class GlobalClipboard internal constructor(
+    public val inner: Inner = Inner(),
+)
 
 /**
  * State of clipboard manager handover.

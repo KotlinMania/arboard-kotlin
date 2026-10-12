@@ -91,5 +91,10 @@ public class OsxClipboard internal constructor() {
 
     public companion object {
         public fun new(): OsxClipboard = OsxClipboard()
+
+        public fun imageFromPixels(pixels: ByteArray, width: Int, height: Int): ImageData =
+            ImageData(width = width, height = height, bytes = pixels)
+
+        public fun release(data: Any?) {}
     }
 }

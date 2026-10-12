@@ -294,6 +294,129 @@ public class WindowsClipboard internal constructor() {
 
             return ImageData(width = width, height = height, bytes = outputBytes)
         }
+
+        public fun convertBytesToU32s(bytes: ByteArray): ImageDataCow {
+            require(bytes.size % 4 == 0) { "Byte array length must be a multiple of 4" }
+            val count = bytes.size / 4
+            val pixels = UIntArray(count)
+            for (i in 0 until count) {
+                val b0 = bytes[i * 4].toUByte().toUInt()
+                val b1 = bytes[i * 4 + 1].toUByte().toUInt()
+                val b2 = bytes[i * 4 + 2].toUByte().toUInt()
+                val b3 = bytes[i * 4 + 3].toUByte().toUInt()
+                pixels[i] = b0 or (b1 shl 8) or (b2 shl 16) or (b3 shl 24)
+            }
+            return ImageDataCow.Owned(pixels)
+        }
+
+        public fun addCfDibv5(openClipboard: OpenClipboard, image: ImageData) {
+            val flipped = flipV(image)
+            val headerSize = 124
+            val dataSize = headerSize + flipped.bytes.size
+            val dibv5 = ByteArray(dataSize)
+
+            fun writeInt32LE(offset: Int, value: Int) {
+                dibv5[offset] = (value and 0xFF).toByte()
+                dibv5[offset + 1] = ((value shr 8) and 0xFF).toByte()
+                dibv5[offset + 2] = ((value shr 16) and 0xFF).toByte()
+                dibv5[offset + 3] = ((value shr 24) and 0xFF).toByte()
+            }
+
+            fun writeInt16LE(offset: Int, value: Int) {
+                dibv5[offset] = (value and 0xFF).toByte()
+                dibv5[offset + 1] = ((value shr 8) and 0xFF).toByte()
+            }
+
+            writeInt32LE(0, headerSize)
+            writeInt32LE(4, image.width)
+            writeInt32LE(8, image.height)
+            writeInt16LE(12, 1)
+            writeInt16LE(14, 32)
+            writeInt32LE(16, 3)
+            writeInt32LE(20, image.width * image.height * 4)
+            writeInt32LE(24, 0)
+            writeInt32LE(28, 0)
+            writeInt32LE(32, 0)
+            writeInt32LE(36, 0)
+            writeInt32LE(40, 0x00FF0000)
+            writeInt32LE(44, 0x0000FF00)
+            writeInt32LE(48, 0x000000FF)
+            writeInt32LE(52, 0xFF000000.toInt())
+            writeInt32LE(56, LCS_sRGB.toInt())
+            writeInt32LE(84, 4)
+
+            val winPixels = rgbaToWin(flipped.bytes)
+            winPixels.copyInto(dibv5, destinationOffset = headerSize)
+            openClipboard.clipboard.setImage(image)
+        }
+
+        public fun addPngFile(image: ImageData) {}
+
+        public fun readPng(data: ByteArray): ImageData {
+            if (data.size < 24) throw Error.ConversionFailure
+            val pngMagic = byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
+            for (i in 0 until 8) {
+                if (data[i] != pngMagic[i]) throw Error.ConversionFailure
+            }
+            val width =
+                ((data[16].toInt() and 0xFF) shl 24) or
+                    ((data[17].toInt() and 0xFF) shl 16) or
+                    ((data[18].toInt() and 0xFF) shl 8) or
+                    (data[19].toInt() and 0xFF)
+            val height =
+                ((data[20].toInt() and 0xFF) shl 24) or
+                    ((data[21].toInt() and 0xFF) shl 16) or
+                    ((data[22].toInt() and 0xFF) shl 8) or
+                    (data[23].toInt() and 0xFF)
+            return ImageData(width = width, height = height, bytes = data)
+        }
+
+        public fun globalAlloc(size: Int): Long = if (size > 0) 1L else throw Error.Unknown("Allocation failed")
+
+        public fun globalLock(hglobal: Long): Long = if (hglobal != 0L) hglobal else throw Error.Unknown("Lock failed")
+
+        public fun globalUnlockChecked(hglobal: Long) {}
+
+        public fun lastError(msg: String): Error = Error.Unknown(msg)
+
+        public fun wrapHtml(ctn: String): String {
+            val hVersion = "Version:0.9"
+            val hStartHtml = "\r\nStartHTML:"
+            val hEndHtml = "\r\nEndHTML:"
+            val hStartFrag = "\r\nStartFragment:"
+            val hEndFrag = "\r\nEndFragment:"
+            val cStartFrag = "\r\n<html>\r\n<body>\r\n<!--StartFragment-->\r\n"
+            val cEndFrag = "\r\n<!--EndFragment-->\r\n</body>\r\n</html>"
+            val hLen =
+                hVersion.length +
+                    hStartHtml.length + 10 +
+                    hEndHtml.length + 10 +
+                    hStartFrag.length + 10 +
+                    hEndFrag.length + 10
+            val nStartHtml = hLen + 2
+            val nStartFrag = hLen + cStartFrag.length
+            val nEndFrag = nStartFrag + ctn.length
+            val nEndHtml = nEndFrag + cEndFrag.length
+
+            fun pad10(v: Int): String = v.toString().padStart(10, '0')
+
+            return "$hVersion$hStartHtml${pad10(nStartHtml)}$hEndHtml${pad10(nEndHtml)}$hStartFrag${pad10(nStartFrag)}$hEndFrag${pad10(nEndFrag)}$cStartFrag$ctn$cEndFrag"
+        }
+
+        public fun toFinalPathWide(path: String): List<UShort>? {
+            val utf16 = path.map { it.code.toUShort() }.toMutableList()
+            utf16.add(0u)
+            return utf16
+        }
+
+        public fun <T> fillUtf16Buf(f1: (Int) -> Int, f2: (List<UShort>) -> T): T? {
+            val buf = mutableListOf<UShort>()
+            val sz = f1(512)
+            if (sz > 0) {
+                return f2(buf)
+            }
+            return null
+        }
     }
 }
 
@@ -301,7 +424,7 @@ public class WindowsClipboard internal constructor() {
  * An open clipboard session.
  */
 public class OpenClipboard internal constructor(
-    private val clipboard: WindowsClipboard,
+    internal val clipboard: WindowsClipboard,
 )
 
 /**
