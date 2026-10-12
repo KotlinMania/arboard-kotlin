@@ -11,6 +11,7 @@ and conditions of the chosen license apply to this file.
 
 package io.github.kotlinmania.arboard.platform
 
+import io.github.kotlinmania.arboard.ImageData
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -722,5 +723,45 @@ class WindowsTest {
                 100,
             )
         assertContentEquals(expected, image.bytes)
+    }
+
+    @Test
+    fun wrapHtmlFormatting() {
+        val html = "<p>Hello</p>"
+        val wrapped = WindowsClipboard.wrapHtml(html)
+        assertEquals(true, wrapped.startsWith("Version:0.9\r\nStartHTML:"))
+        assertEquals(true, wrapped.contains("<!--StartFragment-->\r\n<p>Hello</p>\r\n<!--EndFragment-->"))
+    }
+
+    @Test
+    fun convertBytesToU32sTest() {
+        val bytes = byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8)
+        val cow = WindowsClipboard.convertBytesToU32s(bytes)
+        assertEquals(true, cow is ImageDataCow.Owned)
+        val owned = cow as ImageDataCow.Owned
+        assertEquals(2, owned.pixels.size)
+        assertEquals(0x04030201u, owned.pixels[0])
+        assertEquals(0x08070605u, owned.pixels[1])
+    }
+
+    @Test
+    fun addCfDibv5Test() {
+        val clipboard = WindowsClipboard.new()
+        val openCb = OpenClipboard(clipboard)
+        val img = ImageData(width = 1, height = 1, bytes = byteArrayOf(10, 20, 30, 40))
+        WindowsClipboard.addCfDibv5(openCb, img)
+        assertEquals(1, clipboard.image().width)
+        assertEquals(1, clipboard.image().height)
+        assertContentEquals(byteArrayOf(10, 20, 30, 40), clipboard.image().bytes)
+    }
+
+    @Test
+    fun pathHelpersTest() {
+        val wide = WindowsClipboard.toFinalPathWide("C:\\test")
+        assertEquals(8, wide?.size)
+        assertEquals(0u.toUShort(), wide?.last())
+
+        val res = WindowsClipboard.fillUtf16Buf({ it }) { it.size }
+        assertEquals(0, res)
     }
 }

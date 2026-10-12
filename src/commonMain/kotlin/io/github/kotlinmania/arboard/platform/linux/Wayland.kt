@@ -122,6 +122,12 @@ public class WaylandClipboard internal constructor() {
 
         internal fun tryInto(selection: LinuxClipboardKind): LinuxClipboardKind = selection
 
+        public fun <T> handleClipboardRead(
+            selection: LinuxClipboardKind,
+            mime: String,
+            intoRequestedData: (ByteArray) -> T,
+        ): T = throw Error.ContentNotAvailable
+
         public fun new(): WaylandClipboard = WaylandClipboard()
     }
 }
