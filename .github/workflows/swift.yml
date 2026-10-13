@@ -85,26 +85,7 @@ jobs:
           FRAMEWORKS_FOLDER_PATH: Frameworks
           MACOSX_DEPLOYMENT_TARGET: "15.0"
           DEPLOYMENT_TARGET_SETTING_NAME: MACOSX_DEPLOYMENT_TARGET
-        run: |
-          ./gradlew embedSwiftExportForXcode --no-configuration-cache
-          python3 -c '
-          import os, re
-          spm_dir = "build/SPMPackage"
-          if os.path.exists(spm_dir):
-              for root, _, files in os.walk(spm_dir):
-                  if "Package.swift" in files:
-                      path = os.path.join(root, "Package.swift")
-                      with open(path, "r") as f:
-                          text = f.read()
-                      if "swift-tools-version: 6.0" in text:
-                          text = text.replace("swift-tools-version: 6.0", "swift-tools-version: 5.9")
-                      if "platforms:" not in text:
-                          text = re.sub(r"(let package = Package\s*\(\s*name:\s*\"[^\"]*\",)", r"\1\n    platforms: [.macOS(\"15.0\")],", text, count=1)
-                      elif ".macOS(.v15)" in text or ".macOS(.v14)" in text:
-                          text = text.replace(".macOS(.v15)", ".macOS(\"15.0\")").replace(".macOS(.v14)", ".macOS(\"15.0\")")
-                      with open(path, "w") as f:
-                          f.write(text)
-          '
+        run: ./gradlew embedSwiftExportForXcode --no-configuration-cache
 
       - name: Run swift test against Kotlin-exported module
         working-directory: swift-test-harness
