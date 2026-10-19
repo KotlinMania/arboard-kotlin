@@ -1,4 +1,3 @@
-// port-lint: source lib.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
@@ -11,31 +10,7 @@ and conditions of the chosen license apply to this file.
 
 package io.github.kotlinmania.arboard
 
-/**
- * The kind of Linux clipboard to interact with.
- *
- * Linux has a concept of clipboard "selections" which tend to be used in different contexts. This
- * enum provides a way to get/set to a specific clipboard (the default
- * `Clipboard` being used for the common platform API).
- */
-public enum class LinuxClipboardKind {
-    /**
-     * Typically used selection for explicit cut/copy/paste actions (ie. windows/macos like
-     * clipboard behavior).
-     */
-    Clipboard,
-
-    /**
-     * Typically used for mouse selections and/or currently selected text. Accessible via middle
-     * mouse click.
-     */
-    Primary,
-
-    /**
-     * The secondary clipboard is rarely used but theoretically available on X11.
-     */
-    Secondary,
-}
+import io.github.kotlinmania.arboard.platform.linux.LinuxClipboardKind
 
 /**
  * The OS independent class for accessing the clipboard.
@@ -48,8 +23,6 @@ public enum class LinuxClipboardKind {
  * behavior leaks through unsolvably.
  */
 public class Clipboard {
-    private val contents = mutableMapOf<LinuxClipboardKind, ClipboardData>()
-
     internal data class ClipboardData(
         var text: String? = null,
         var html: String? = null,
@@ -57,9 +30,6 @@ public class Clipboard {
         var image: ImageData? = null,
         var fileList: List<String> = emptyList(),
     )
-
-    private fun getOrCreateData(kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard): ClipboardData =
-        contents.getOrPut(kind) { ClipboardData() }
 
     /**
      * Fetches UTF-8 text from the clipboard and returns it.
@@ -125,15 +95,27 @@ public class Clipboard {
     public fun set(): Set = Set(this)
 
     public fun clearKind(kind: LinuxClipboardKind) {
-        contents.remove(kind)
+        Companion.clearKind(kind)
     }
 
-    internal fun getData(kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard): ClipboardData? = contents[kind]
+    internal fun getData(kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard): ClipboardData? =
+        Companion.getData(kind)
 
     internal fun getOrCreate(kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard): ClipboardData =
-        getOrCreateData(kind)
+        Companion.getOrCreate(kind)
 
     public companion object {
+        private val contents = mutableMapOf<LinuxClipboardKind, ClipboardData>()
+
+        internal fun getData(kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard): ClipboardData? = contents[kind]
+
+        internal fun getOrCreate(kind: LinuxClipboardKind = LinuxClipboardKind.Clipboard): ClipboardData =
+            contents.getOrPut(kind) { ClipboardData() }
+
+        internal fun clearKind(kind: LinuxClipboardKind) {
+            contents.remove(kind)
+        }
+
         /**
          * Creates an instance of the clipboard.
          */

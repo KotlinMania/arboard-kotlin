@@ -13,9 +13,6 @@ package io.github.kotlinmania.arboard.platform.linux
 
 import io.github.kotlinmania.arboard.Error
 import io.github.kotlinmania.arboard.ImageData
-import io.github.kotlinmania.arboard.LinuxClipboardKind
-
-private typealias Result<T> = kotlin.Result<T>
 
 /**
  * X11-specific clipboard backend.

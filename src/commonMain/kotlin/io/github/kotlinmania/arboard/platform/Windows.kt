@@ -13,6 +13,14 @@ package io.github.kotlinmania.arboard.platform
 
 import io.github.kotlinmania.arboard.Error
 import io.github.kotlinmania.arboard.ImageData
+import io.github.kotlinmania.image.ExtendedColorType
+import io.github.kotlinmania.image.codecs.png.PngDecoder
+import io.github.kotlinmania.image.codecs.png.PngEncoder
+import io.github.kotlinmania.image.images.DynamicImage
+import io.github.kotlinmania.image.io.BufferIoWrite
+import io.github.kotlinmania.log.formatArgs
+import io.github.kotlinmania.windowssys.windows.win32.foundation.HGLOBAL
+import io.github.kotlinmania.log.error as logError
 
 /**
  * Windows-specific extensions to the [io.github.kotlinmania.arboard.Set] builder.
@@ -350,32 +358,43 @@ public class WindowsClipboard internal constructor() {
             openClipboard.clipboard.setImage(image)
         }
 
-        public fun addPngFile(image: ImageData) {}
+        public fun addPngFile(image: ImageData) {
+            val out = BufferIoWrite()
+            val encoder = PngEncoder(out)
+            try {
+                encoder.writeImage(
+                    image.bytes,
+                    image.width.toUInt(),
+                    image.height.toUInt(),
+                    ExtendedColorType.Rgba8,
+                )
+            } catch (_: Exception) {
+                throw Error.ConversionFailure
+            }
+        }
 
         public fun readPng(data: ByteArray): ImageData {
             if (data.size < 24) throw Error.ConversionFailure
-            val pngMagic = byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
-            for (i in 0 until 8) {
-                if (data[i] != pngMagic[i]) throw Error.ConversionFailure
+            return try {
+                val decoder = PngDecoder(data)
+                val (width, height) = decoder.dimensions()
+                val dynamicImage = DynamicImage.fromDecoder(decoder)
+                val bytes = dynamicImage.intoRgba8().intoRaw()
+                ImageData(width = width.toInt(), height = height.toInt(), bytes = bytes)
+            } catch (_: Exception) {
+                throw Error.ConversionFailure
             }
-            val width =
-                ((data[16].toInt() and 0xFF) shl 24) or
-                    ((data[17].toInt() and 0xFF) shl 16) or
-                    ((data[18].toInt() and 0xFF) shl 8) or
-                    (data[19].toInt() and 0xFF)
-            val height =
-                ((data[20].toInt() and 0xFF) shl 24) or
-                    ((data[21].toInt() and 0xFF) shl 16) or
-                    ((data[22].toInt() and 0xFF) shl 8) or
-                    (data[23].toInt() and 0xFF)
-            return ImageData(width = width, height = height, bytes = data)
         }
 
-        public fun globalAlloc(size: Int): Long = if (size > 0) 1L else throw Error.Unknown("Allocation failed")
+        public fun globalAlloc(size: Int): HGLOBAL = if (size > 0) 1L else throw Error.Unknown("Allocation failed")
 
-        public fun globalLock(hglobal: Long): Long = if (hglobal != 0L) hglobal else throw Error.Unknown("Lock failed")
+        public fun globalLock(hglobal: HGLOBAL): Long = if (hglobal != 0L) hglobal else throw Error.Unknown("Lock failed")
 
-        public fun globalUnlockChecked(hglobal: Long) {}
+        public fun globalUnlockChecked(hglobal: HGLOBAL) {
+            if (hglobal == 0L) {
+                logError(formatArgs("Failed calling GlobalUnlock when writing data: invalid handle"))
+            }
+        }
 
         public fun lastError(msg: String): Error = Error.Unknown(msg)
 

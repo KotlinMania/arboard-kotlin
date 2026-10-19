@@ -16,3 +16,13 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "arboard-kotlin"
+
+val imageKotlinLocal = file("../image-kotlin")
+if (imageKotlinLocal.exists()) {
+    includeBuild(imageKotlinLocal) {
+        dependencySubstitution {
+            substitute(module("io.github.kotlinmania:image-kotlin"))
+                .using(project(":"))
+        }
+    }
+}

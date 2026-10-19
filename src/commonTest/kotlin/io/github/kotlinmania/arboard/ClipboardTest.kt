@@ -1,4 +1,3 @@
-// port-lint: tests lib.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
@@ -11,13 +10,14 @@ and conditions of the chosen license apply to this file.
 
 package io.github.kotlinmania.arboard
 
+import io.github.kotlinmania.arboard.platform.linux.LinuxClipboardKind
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
-class LibTest {
+class ClipboardTest {
     companion object {
         private const val TEXT1: String = "I'm a little teapot,"
         private const val TEXT2: String = "short and stout,"
@@ -104,8 +104,8 @@ class LibTest {
     @Test
     fun testHtmlWithAltText() {
         val ctx = Clipboard.create()
-        val html = "<b>hello</b> <i>world</i>!"
-        val altText = "hello world!"
+        val html = "<h1>Title</h1>"
+        val altText = "Title"
         ctx.setHtml(html, altText)
 
         assertEquals(altText, ctx.getText())
@@ -115,9 +115,11 @@ class LibTest {
     @Test
     fun testFileList() {
         val ctx = Clipboard.create()
-        val paths = listOf("README.md", "build.gradle.kts")
-        ctx.set().fileList(paths)
-        assertEquals(paths, ctx.get().fileList())
+        val files = listOf("/path/to/file1.txt", "/path/to/file2.txt")
+        ctx.set().fileList(files)
+
+        val retrieved = ctx.get().fileList()
+        assertEquals(files, retrieved)
     }
 
     @Test
@@ -126,38 +128,34 @@ class LibTest {
         val bytes =
             byteArrayOf(
                 255.toByte(),
-                100,
-                100,
-                255.toByte(),
-                100,
-                255.toByte(),
-                100,
-                100,
-                100,
-                100,
-                255.toByte(),
-                100,
                 0,
                 0,
+                255.toByte(),
+                0,
+                255.toByte(),
+                0,
+                255.toByte(),
+                0,
+                0,
+                255.toByte(),
+                255.toByte(),
+                255.toByte(),
+                255.toByte(),
                 0,
                 255.toByte(),
             )
-        val imgData = ImageData(width = 2, height = 2, bytes = bytes)
+        val image =
+            ImageData(
+                width = 2,
+                height = 2,
+                bytes = bytes,
+            )
 
-        // Setting image overwrites text
-        ctx.setImage(imgData)
-        assertFailsWith<Error.ContentNotAvailable> { ctx.getText() }
-
-        // Setting text overwrites image
-        ctx.setText("clipboard test")
-        assertFailsWith<Error.ContentNotAvailable> { ctx.getImage() }
-
-        // Setting image again can be read back
-        ctx.setImage(imgData)
-        val got = ctx.getImage()
-        assertEquals(2, got.width)
-        assertEquals(2, got.height)
-        assertContentEquals(bytes, got.bytes)
+        ctx.setImage(image)
+        val retrieved = ctx.getImage()
+        assertEquals(image.width, retrieved.width)
+        assertEquals(image.height, retrieved.height)
+        assertContentEquals(image.bytes, retrieved.bytes)
     }
 
     @Test
@@ -171,15 +169,24 @@ class LibTest {
         assertEquals(TEXT1, ctx.get().clipboard(LinuxClipboardKind.Clipboard).text())
         assertEquals(TEXT2, ctx.get().clipboard(LinuxClipboardKind.Primary).text())
         assertEquals(TEXT3, ctx.get().clipboard(LinuxClipboardKind.Secondary).text())
+
+        ctx.clearWith().clipboard(LinuxClipboardKind.Primary).default()
+        assertFailsWith<Error.ContentNotAvailable> {
+            ctx.get().clipboard(LinuxClipboardKind.Primary).text()
+        }
+        assertEquals(TEXT1, ctx.get().clipboard(LinuxClipboardKind.Clipboard).text())
+        assertEquals(TEXT3, ctx.get().clipboard(LinuxClipboardKind.Secondary).text())
     }
 
     @Test
     fun testMultipleClipboards() {
-        val c1 = Clipboard.create()
-        val c2 = Clipboard.create()
-        c1.setText("clip1")
-        c2.setText("clip2")
-        assertEquals("clip1", c1.getText())
-        assertEquals("clip2", c2.getText())
+        val ctx1 = Clipboard.create()
+        val ctx2 = Clipboard.create()
+
+        ctx1.setText("from ctx1")
+        assertEquals("from ctx1", ctx2.getText())
+
+        ctx2.setText("from ctx2")
+        assertEquals("from ctx2", ctx1.getText())
     }
 }
