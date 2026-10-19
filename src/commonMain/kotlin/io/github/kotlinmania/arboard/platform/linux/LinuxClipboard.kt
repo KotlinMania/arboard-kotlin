@@ -1,4 +1,3 @@
-// port-lint: source platform/linux/mod.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
@@ -13,7 +12,9 @@ package io.github.kotlinmania.arboard.platform.linux
 
 import io.github.kotlinmania.arboard.Error
 import io.github.kotlinmania.arboard.ImageData
-import io.github.kotlinmania.arboard.LinuxClipboardKind
+import io.github.kotlinmania.image.ExtendedColorType
+import io.github.kotlinmania.image.codecs.png.PngEncoder
+import io.github.kotlinmania.image.io.BufferIoWrite
 
 /**
  * Converts an error description into an Unknown error.
@@ -27,65 +28,19 @@ public fun encodeAsPng(image: ImageData): ByteArray {
     if (image.bytes.isEmpty() || image.width == 0 || image.height == 0) {
         throw Error.ConversionFailure
     }
-    return image.bytes
-}
-
-/**
- * Linux-specific extensions to the [io.github.kotlinmania.arboard.Get] builder.
- */
-public interface GetExtLinux {
-    /**
-     * Sets which Linux clipboard to read from.
-     */
-    public fun clipboard(selection: LinuxClipboardKind): GetExtLinux
-}
-
-/**
- * Configuration on how long to wait for a new X11 copy event.
- */
-public sealed class WaitConfig {
-    public class Until(
-        public val deadlineMillis: Long,
-    ) : WaitConfig()
-
-    public object Forever : WaitConfig()
-
-    public object None : WaitConfig()
-}
-
-/**
- * Linux-specific extensions to the [io.github.kotlinmania.arboard.Set] builder.
- */
-public interface SetExtLinux {
-    /**
-     * Sets which Linux clipboard to write to.
-     */
-    public fun clipboard(selection: LinuxClipboardKind): SetExtLinux
-
-    /**
-     * Completes the set operation and waits for a paste event if required.
-     */
-    public fun wait(): SetExtLinux
-
-    /**
-     * Waits until the given deadline in milliseconds.
-     */
-    public fun waitUntil(deadlineMillis: Long): SetExtLinux
-
-    /**
-     * Excludes data from clipboard manager history.
-     */
-    public fun excludeFromHistory(): SetExtLinux
-}
-
-/**
- * Linux-specific extensions to the [io.github.kotlinmania.arboard.Clear] builder.
- */
-public interface ClearExtLinux {
-    /**
-     * Sets which Linux clipboard to clear.
-     */
-    public fun clipboard(selection: LinuxClipboardKind): ClearExtLinux
+    val out = BufferIoWrite()
+    val encoder = PngEncoder(out)
+    try {
+        encoder.writeImage(
+            image.bytes,
+            image.width.toUInt(),
+            image.height.toUInt(),
+            ExtendedColorType.Rgba8,
+        )
+    } catch (_: Exception) {
+        throw Error.ConversionFailure
+    }
+    return out.toByteArray()
 }
 
 /**

@@ -1,4 +1,3 @@
-// port-lint: tests platform/linux/mod.rs
 /*
 SPDX-License-Identifier: Apache-2.0 OR MIT
 
